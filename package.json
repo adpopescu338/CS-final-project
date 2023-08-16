@@ -9,7 +9,7 @@
     "dev:be": "nodemon",
     "dev:fe": "cd client && yarn start",
     "build": "tsc && cd client && yarn build",
-    "start": "node index.js"
+    "start": "nodemon .dist/index.js"
   },
   "dependencies": {
     "concurrently": "^8.2.0",
