@@ -26,6 +26,8 @@ app.get('*', (req, res) => {
 
 app.use('/api', router);
 
-app.listen(3001, () => {
-  console.log('Server listening on port 3001!');
+const PORT = (process.env.PORT && Number(process.env.PORT)) || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server listening at http://localhost:${PORT}`);
 });

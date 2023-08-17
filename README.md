@@ -24,3 +24,8 @@ docker run --name mysql-container -e MYSQL_ROOT_PASSWORD=<password> -p 3306:3306
 
 docker pull postgres
 docker run --name postgres-container -e POSTGRES_PASSWORD=<password> -p 5432:5432 postgres:latest
+
+
+
+docker build -t cs-express .
+docker run --name cs-express-container -p 3001:3000 cs-express:latest

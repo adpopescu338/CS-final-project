@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cs-express-deployment
+  labels:
+    app: cs-express
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cs-express
+  template:
+    metadata:
+      labels:
+        app: cs-express
+    spec:
+      containers:
+      - name: cs-express-container
+        image: cs-express:latest
+        ports:
+        - containerPort: 3000
