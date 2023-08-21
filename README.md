@@ -8,6 +8,7 @@ Ideally I would use kubernetes to scale the databases, but I don't have money to
 I'll also use this readme as a notebook, so I remember what I did.
 
 ## Development
+
 `yarn dev` will start both the server and the client in development mode.
 
 ## Mongo
@@ -25,7 +26,24 @@ docker run --name mysql-container -e MYSQL_ROOT_PASSWORD=<password> -p 3306:3306
 docker pull postgres
 docker run --name postgres-container -e POSTGRES_PASSWORD=<password> -p 5432:5432 postgres:latest
 
-
-
 docker build -t cs-express .
 docker run --name cs-express-container -p 3001:3000 cs-express:latest
+
+## Backend
+
+### Validation
+
+```
+import { validate } from './lib/middleware';
+import * as yup from 'yup';
+
+const schemaValidator: yup.Schema = yup.object({
+  query: yup.object().shape({
+    age: yup.number().required().min(18).max(601),
+  }),
+});
+...
+app.get('/', validate(schemaValidator), (req, res) => {
+ ...
+});
+```

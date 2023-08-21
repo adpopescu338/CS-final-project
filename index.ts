@@ -3,17 +3,12 @@ import { router } from './routes';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import { errorHandler } from './lib/middleware';
 
 config();
 
 const app = express();
 app.use(cors());
-
-app.get('/hello', (req, res) => {
-  res.send({
-    message: 'Hello Worlds!',
-  });
-});
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, './client/build')));
@@ -25,6 +20,7 @@ app.get('*', (req, res) => {
 });
 
 app.use('/api', router);
+app.use(errorHandler);
 
 const PORT = (process.env.PORT && Number(process.env.PORT)) || 3000;
 
