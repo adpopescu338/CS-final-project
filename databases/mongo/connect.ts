@@ -30,6 +30,11 @@ export const connect = async (connectionDetails?: ConnectionDetails): Promise<Mo
     connectionsMap.delete(key);
   });
 
+  connection.on('error', (err) => {
+    console.log('Connection error!', err);
+    connectionsMap.delete(key);
+  });
+
   connectionsMap.set(key, connection);
   return connection;
 };
