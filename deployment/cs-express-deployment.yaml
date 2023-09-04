@@ -15,7 +15,22 @@ spec:
         app: cs-express
     spec:
       containers:
-      - name: cs-express-container
-        image: cs-express:latest
-        ports:
-        - containerPort: 3000
+        - name: cs-express-container
+          image: adpopescu3382/devops-playground:cs-express
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: MONGO_USERNAME
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: MONGO_PASSWORD
+            - name: MONGO_HOST
+              value: 'mongo-service.default.svc.cluster.local'
+            - name: MONGO_PUBLIC_IP
+              value: '127.0.0.1'

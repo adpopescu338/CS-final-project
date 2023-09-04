@@ -4,8 +4,12 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { errorHandler } from './lib/middleware';
+import { setDbPublicIpAddress } from './lib/k8/setDbPublicIpAddress';
+import { checkMandatoryEnvVariables } from './lib/checkMandatoryEnvVariables';
 
 config();
+setDbPublicIpAddress();
+checkMandatoryEnvVariables();
 
 const app = express();
 app.use(cors());

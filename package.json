@@ -12,6 +12,7 @@
     "start": "nodemon .dist/index.js"
   },
   "dependencies": {
+    "@kubernetes/client-node": "^0.18.1",
     "concurrently": "^8.2.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
