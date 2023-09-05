@@ -1,5 +1,6 @@
 import { MongoClient } from 'mongodb';
 import { UserDetails, UserCreatedDetails } from '../DBManager';
+import { MONGO_PORT } from 'libs/constants/backend';
 
 export const createDbAndUser = async (
   db: MongoClient,
@@ -16,7 +17,7 @@ export const createDbAndUser = async (
   }
 
   return {
-    connectionUrl: `mongodb://${username}:${password}@${process.env.MONGO_HOST}:27017/${database}`,
+    connectionUrl: `mongodb://${username}:${password}@${process.env.MONGO_HOST}:${MONGO_PORT}/${database}`,
     username,
     password,
     database,

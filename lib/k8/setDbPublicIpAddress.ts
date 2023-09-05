@@ -1,11 +1,17 @@
 import k8s from '@kubernetes/client-node';
 
-const getPublicIpAddress = async (dbService: 'mongo-service') => {
+const getPublicIpAddress = async (
+  dbService: 'mongo-service' | 'mysql-service' | 'postgres-service'
+) => {
   // first let's check if we are running in a k8s cluster
   if (!process.env.KUBERNETES_SERVICE_HOST) {
     switch (dbService) {
       case 'mongo-service':
         return process.env.MONGO_HOST;
+      case 'mysql-service':
+        return process.env.MYSQL_HOST;
+      case 'postgres-service':
+        return process.env.POSTGRES_HOST;
       default:
         throw new Error(`Invalid dbService: ${dbService}`);
     }
@@ -34,8 +40,13 @@ const getPublicIpAddress = async (dbService: 'mongo-service') => {
 };
 
 export const setDbPublicIpAddress = async () => {
-  // TODO: add more services here
-  const [mongoServiceIp] = await Promise.all([getPublicIpAddress('mongo-service')]);
+  const [mongoServiceIp, mysqlServiceIp, postgresServiceIp] = await Promise.all([
+    getPublicIpAddress('mongo-service'),
+    getPublicIpAddress('mysql-service'),
+    getPublicIpAddress('postgres-service'),
+  ]);
 
   process.env.MONGO_PUBLIC_HOST = mongoServiceIp;
+  process.env.MYSQL_PUBLIC_HOST = mysqlServiceIp;
+  process.env.POSTGRES_PUBLIC_HOST = postgresServiceIp;
 };

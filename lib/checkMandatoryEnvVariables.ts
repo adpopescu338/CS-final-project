@@ -3,6 +3,14 @@ const MANDATORY_ENV_VARIABLES = [
   'MONGO_USERNAME',
   'MONGO_HOST',
   'MONGO_PUBLIC_HOST',
+  //
+  'MYSQL_PASSWORD',
+  'MYSQL_HOST',
+  'MYSQL_PUBLIC_HOST',
+  //
+  'POSTGRES_PASSWORD',
+  'POSTGRES_HOST',
+  'POSTGRES_PUBLIC_HOST',
   // TODO: add more mandatory env variables here
 ];
 

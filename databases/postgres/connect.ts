@@ -1,11 +1,12 @@
 import pg from 'pg';
 import { ConnectionDetails } from '../DBManager';
+import { POSTGRES_PORT } from 'libs/constants/backend';
 
 const getDefaultConnectionDetails = (details?: Partial<ConnectionDetails>): ConnectionDetails => ({
   host: process.env.POSTGRES_HOST as string,
-  user: process.env.POSTGRES_USER as string,
   password: process.env.POSTGRES_PASSWORD as string,
-  port: 5432,
+  user: 'postgres',
+  port: POSTGRES_PORT,
   ...details,
 });
 

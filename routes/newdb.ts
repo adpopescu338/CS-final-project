@@ -2,8 +2,6 @@ import { Request, Response } from 'express';
 import { mongoManager, mysqlManager, postgresManager, DatabaseType } from '../databases';
 import * as yup from 'yup';
 
-const newDatabase = 'test';
-
 const getNewUser = (body: any) =>
   ({
     username: body.username + Math.random().toString(36).substring(7),
@@ -19,20 +17,20 @@ const createUser =
     const user = await dbManager.createDbAndUser({
       username: newUser.username,
       password: newUser.password,
-      database: newDatabase,
+      database: newUser.database,
     });
-console.log('user', user);
+    console.log('user', user);
     const success = await dbManager.checkUserCreation({
       user: newUser.username,
       password: newUser.password,
-      database: newDatabase,
+      database: newUser.database,
     });
 
     if (success) return res.status(200).send(user);
 
     await Promise.all([
       dbManager.deleteUser(newUser.username),
-      dbManager.deleteDatabase(newDatabase),
+      dbManager.deleteDatabase(newUser.database),
     ]);
 
     return res.status(500).send({

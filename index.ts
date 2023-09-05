@@ -8,8 +8,6 @@ import { setDbPublicIpAddress } from './lib/k8/setDbPublicIpAddress';
 import { checkMandatoryEnvVariables } from './lib/checkMandatoryEnvVariables';
 
 config();
-setDbPublicIpAddress();
-checkMandatoryEnvVariables();
 
 const app = express();
 app.use(cors());
@@ -29,6 +27,13 @@ app.use(errorHandler);
 
 const PORT = (process.env.PORT && Number(process.env.PORT)) || 3000;
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server listening at http://localhost:${PORT}`);
+  await setDbPublicIpAddress();
+  try {
+    checkMandatoryEnvVariables();
+  } catch (e) {
+    console.error(e);
+    process.exit(1);
+  }
 });

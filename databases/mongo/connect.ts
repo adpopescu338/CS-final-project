@@ -1,11 +1,12 @@
 import { MongoClient } from 'mongodb';
 import { ConnectionDetails } from '../DBManager';
+import { MONGO_PORT } from 'libs/constants/backend';
 
 const getDefaultConnectionDetails = (details?: Partial<ConnectionDetails>): ConnectionDetails => ({
   user: process.env.MONGO_USERNAME as string,
   password: process.env.MONGO_PASSWORD as string,
   host: process.env.MONGO_HOST as string,
-  port: 27017,
+  port: MONGO_PORT,
   ...details,
 });
 
@@ -21,7 +22,7 @@ export const connect = async (connectionDetails?: ConnectionDetails): Promise<Mo
 
   const auth = `${connectionDetails.user}:${connectionDetails.password}@`;
   const dbName = connectionDetails.database || '';
-  const connectionString = `mongodb://${auth}${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/${dbName}`;
+  const connectionString = `mongodb://${auth}${connectionDetails.host}:${connectionDetails.port}/${dbName}`;
 
   const connection = await MongoClient.connect(connectionString);
 

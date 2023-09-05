@@ -23,14 +23,32 @@ spec:
             - name: MONGO_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: mongo-secret
+                  name: apps-secrets
                   key: MONGO_USERNAME
             - name: MONGO_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mongo-secret
+                  name: apps-secrets
                   key: MONGO_PASSWORD
             - name: MONGO_HOST
               value: 'mongo-service.default.svc.cluster.local'
-            - name: MONGO_PUBLIC_IP
-              value: '127.0.0.1'
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: apps-secrets
+                  key: MYSQL_PASSWORD
+            - name: MYSQL_HOST
+              value: 'mysql-service.default.svc.cluster.local'
+            name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: apps-secrets
+                key: POSTGRES_PASSWORD
+            - name: POSTGRES_HOST
+              value: 'postgres-service.default.svc.cluster.local'
+            - name: POSTGRES_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: apps-secrets
+                  key: POSTGRES_USERNAME
+            

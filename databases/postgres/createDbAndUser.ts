@@ -1,5 +1,6 @@
 import { Client } from 'pg';
 import { UserCreatedDetails, UserDetails } from '../DBManager';
+import { POSTGRES_PORT } from 'libs/constants/backend';
 
 export const createDbAndUser = async (
   client: Client,
@@ -46,7 +47,7 @@ export const createDbAndUser = async (
             username,
             password,
             database,
-            connectionUrl: `postgres://${username}:${password}@${process.env.POSTGRES_HOST}:${process.env.POSTGRES_PORT}/${database}`,
+            connectionUrl: `postgres://${username}:${password}@${process.env.POSTGRES_HOST}:${POSTGRES_PORT}/${database}`,
           });
         });
       });

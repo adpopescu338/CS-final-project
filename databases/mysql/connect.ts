@@ -1,13 +1,14 @@
 import mysql, { Connection } from 'mysql2';
 import { ConnectionDetails } from '../DBManager';
+import { MYSQL_PORT } from 'libs/constants/backend';
 
 const connectionsMap = new Map();
 
 const getDefaultConnectionDetails = (details?: Partial<ConnectionDetails>): ConnectionDetails => ({
-  host: '127.0.0.1',
-  user: 'root', // Replace with your MySQL root username
+  host: process.env.MYSQL_HOST as string,
   password: process.env.MYSQL_PASSWORD as string,
-  port: 3306,
+  user: 'root',
+  port: MYSQL_PORT,
   ...details,
 });
 
