@@ -11,7 +11,11 @@ const MANDATORY_ENV_VARIABLES = [
   'POSTGRES_PASSWORD',
   'POSTGRES_HOST',
   'POSTGRES_PUBLIC_HOST',
-  // TODO: add more mandatory env variables here
+  //
+  'SENDGRID_API_KEY',
+  'SENDGRID_FROM_EMAIL',
+  //
+  'JWT_SECRET',
 ];
 
 export const checkMandatoryEnvVariables = () => {

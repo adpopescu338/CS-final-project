@@ -51,4 +51,19 @@ spec:
                 secretKeyRef:
                   name: apps-secrets
                   key: POSTGRES_USERNAME
+            - name: SENDGRID_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: apps-secrets
+                  key: SENDGRID_API_KEY
+            - name: SENDGRID_FROM_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: apps-secrets
+                  key: SENDGRID_FROM_EMAIL
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: apps-secrets
+                  key: JWT_SECRET
             

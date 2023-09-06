@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { mongoManager, mysqlManager, postgresManager, DatabaseType } from '../databases';
 import * as yup from 'yup';
+import { asyncHandler } from 'libs/middleware';
 
 const getNewUser = (body: any) =>
   ({
@@ -38,7 +39,7 @@ const createUser =
     });
   };
 
-export const handler = (req, res) => {
+export const main = (req, res) => {
   const { type } = req.params;
 
   if (type === DatabaseType.mongo) return createUser(mongoManager)(req, res);
@@ -55,3 +56,5 @@ export const schema: yup.Schema = yup.object().shape({
     type: yup.string().required(),
   }),
 });
+
+export const handler = asyncHandler(main);

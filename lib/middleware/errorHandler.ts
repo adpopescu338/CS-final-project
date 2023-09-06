@@ -1,7 +1,7 @@
 import { BeError } from '../BeError';
 
 export const errorHandler = (error, request, response, next) => {
-  console.error(error);
+  console.error('e ====== ', error);
 
   if (error instanceof BeError) {
     return response.status(error.statusCode).json({
@@ -9,7 +9,11 @@ export const errorHandler = (error, request, response, next) => {
       path: request.path,
       date: new Date().toISOString(),
       code: error.code,
+      status: error.statusCode,
     });
   }
-  return response.status(500).json({ message: 'An unknown error occurred' });
+  return response.status(500).json({
+    status: 500,
+    message: 'An unknown error occurred',
+  });
 };

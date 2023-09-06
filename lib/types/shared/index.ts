@@ -1,3 +1,1 @@
-export type Pizza = {
-  name: string;
-};
+export { SessionUser } from './SessionUser';

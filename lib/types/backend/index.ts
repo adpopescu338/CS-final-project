@@ -1,3 +1,1 @@
-export type Pizza2 = {
-  name: string;
-};
+export { AuthedRequest } from './AuthedRequest';
