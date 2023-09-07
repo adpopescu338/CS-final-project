@@ -39,7 +39,7 @@ spec:
                   key: MYSQL_PASSWORD
             - name: MYSQL_HOST
               value: 'mysql-service.default.svc.cluster.local'
-            name: POSTGRES_PASSWORD
+            - name: POSTGRES_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: apps-secrets

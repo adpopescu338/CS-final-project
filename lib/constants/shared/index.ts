@@ -4,4 +4,5 @@ export enum ErrorCodes {
   Forbidden = 'FORBIDDEN',
   BadRequest = 'BAD_REQUEST',
   InternalServerError = 'INTERNAL_SERVER_ERROR',
+  ResourceAlreadyExists = 'RESOURCE_ALREADY_EXISTS',
 }

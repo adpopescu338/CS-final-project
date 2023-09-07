@@ -10,40 +10,36 @@ import bcrypt from 'bcryptjs';
 
 type ReqPayload = {
   body: {
-    password: string;
-    email: string;
+    otp: string;
   };
 };
 
 export const schema: yup.Schema<ReqPayload> = yup.object().shape({
   body: yup.object().shape({
-    password: yup.string().required().min(8).matches(/[a-z]/).matches(/[A-Z]/).matches(/[0-9]/),
-    email: yup.string().email().required(),
+    otp: yup.string().required(),
   }),
 });
 
-const getUserFromDb = async (email: string, password: string) => {
+export const main = async (req: Request, res: Response) => {
+  const { otp } = req.body as ReqPayload['body'];
+
   const user = await client.user.findUnique({
     where: {
-      email,
+      otp,
     },
   });
 
-  if (!user) throw new BeError('User not found', ErrorCodes.NotFound);
+  if (!user) throw new BeError('Invalid OTP', ErrorCodes.NotFound);
 
-  const isMatch = await bcrypt.compare(password, user.password);
-
-  if (!isMatch) throw new BeError('Invalid credentials', ErrorCodes.Unauthorized);
-
-  if (!user.emailVerified) throw new BeError('Email not verified', ErrorCodes.Unauthorized);
-
-  return user;
-};
-
-export const main = async (req: Request, res: Response) => {
-  const { password, email } = req.body as ReqPayload['body'];
-
-  const user = await getUserFromDb(email, password);
+  await client.user.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      otp: null,
+      emailVerified: true,
+    },
+  });
 
   const sessionUser: SessionUser = {
     id: user.id,
@@ -65,7 +61,7 @@ export const main = async (req: Request, res: Response) => {
   });
 
   res.status(200).send({
-    message: 'User logged in successfully',
+    message: 'OTP verified successfully',
     refreshToken,
     user: sessionUser,
   });
