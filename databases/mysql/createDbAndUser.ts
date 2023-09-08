@@ -47,7 +47,9 @@ export const createDbAndUser = async (
             username,
             password,
             database,
-            connectionUrl: `mysql://${username}:${password}@${process.env.MYSQL_HOST}:${MYSQL_PORT}/${database}`,
+            connectionUrl: `mysql://${username}:${password}@${process.env.MYSQL_PUBLIC_HOST}:${MYSQL_PORT}/${database}`,
+            port: MYSQL_PORT,
+            host: process.env.MYSQL_PUBLIC_HOST as string,
           });
         });
       });

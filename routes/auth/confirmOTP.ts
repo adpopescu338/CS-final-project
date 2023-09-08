@@ -2,11 +2,11 @@ import { Request, Response } from 'express';
 import * as yup from 'yup';
 import { BeError } from 'libs/BeError';
 import { ErrorCodes } from 'libs/constants';
-import { asyncHandler } from 'libs/middleware';
+
 import { SessionUser } from 'libs/types';
 import jwt from 'jsonwebtoken';
 import { client } from 'prisma/client';
-import bcrypt from 'bcryptjs';
+import { asyncHandler, validate } from 'libs/middleware';
 
 type ReqPayload = {
   body: {
@@ -14,13 +14,13 @@ type ReqPayload = {
   };
 };
 
-export const schema: yup.Schema<ReqPayload> = yup.object().shape({
+const schema: yup.Schema<ReqPayload> = yup.object().shape({
   body: yup.object().shape({
     otp: yup.string().required(),
   }),
 });
 
-export const main = async (req: Request, res: Response) => {
+const main = async (req: Request, res: Response) => {
   const { otp } = req.body as ReqPayload['body'];
 
   const user = await client.user.findUnique({
@@ -51,8 +51,17 @@ export const main = async (req: Request, res: Response) => {
     expiresIn: '1d',
   });
 
-  // TODO: generate refresh token
-  const refreshToken = '';
+  const { id: refreshToken } = await client.refreshToken.create({
+    data: {
+      user: {
+        connect: {
+          id: user.id,
+        },
+      },
+      // 7 days
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+    },
+  });
 
   res.cookie('authorization', token, {
     httpOnly: true,
@@ -62,9 +71,12 @@ export const main = async (req: Request, res: Response) => {
 
   res.status(200).send({
     message: 'OTP verified successfully',
-    refreshToken,
-    user: sessionUser,
+    data: {
+      refreshToken,
+      user: sessionUser,
+    },
   });
 };
 
+export const validateReq = validate(schema);
 export const handler = asyncHandler(main);

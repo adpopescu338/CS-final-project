@@ -47,7 +47,9 @@ export const createDbAndUser = async (
             username,
             password,
             database,
-            connectionUrl: `postgres://${username}:${password}@${process.env.POSTGRES_HOST}:${POSTGRES_PORT}/${database}`,
+            connectionUrl: `postgres://${username}:${password}@${process.env.POSTGRES_PUBLIC_HOST}:${POSTGRES_PORT}/${database}`,
+            port: POSTGRES_PORT,
+            host: process.env.POSTGRES_PUBLIC_HOST as string,
           });
         });
       });

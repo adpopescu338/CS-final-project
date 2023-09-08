@@ -1,13 +1,14 @@
 import { Router } from 'express';
-import { validate, auth } from 'libs/middleware';
 import * as handleCreateUser from './newdb';
-import * as handleSignup from './signup';
-import * as handleSignin from './signin';
+import { handleConfirmOtp, handleSignIn, handleSignUp, handleRefreshToken } from './auth';
+import { auth } from 'libs/middleware';
 
 const router = Router();
 
-router.post('/newdb/:type', auth, validate(handleCreateUser.schema), handleCreateUser.handler);
-router.post('/signup', validate(handleSignup.schema), handleSignup.handler);
-router.post('/signin', validate(handleSignin.schema), handleSignin.handler);
+router.post('/newdb/:type', auth, handleCreateUser.validateReq, handleCreateUser.handler);
+router.post('/signup', handleSignUp.validateReq, handleSignUp.handler);
+router.post('/signin', handleSignIn.validateReq, handleSignIn.handler);
+router.post('/confirm-otp', handleConfirmOtp.validateReq, handleConfirmOtp.handler);
+router.post('/refresh-token', handleRefreshToken.validateReq, handleRefreshToken.handler);
 
 export { router };

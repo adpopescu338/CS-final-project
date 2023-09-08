@@ -6,6 +6,8 @@ export type UserDetails = {
 
 export type UserCreatedDetails = UserDetails & {
   connectionUrl: string;
+  host: string;
+  port: number;
 };
 
 export type ConnectionDetails = {

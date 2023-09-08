@@ -4,10 +4,11 @@ import { sendMail } from '../sendMail';
 type SendEmailArgs = {
   to: string;
   name: string;
+  otp: string;
 };
 
-export const sendSignupEmail = async ({ to, name }: SendEmailArgs): Promise<void> => {
-  const html = renderSignup({ name });
+export const sendSignupEmail = async ({ to, name, otp }: SendEmailArgs): Promise<void> => {
+  const html = renderSignup({ name, otp });
   console.log('html', html);
   return sendMail({
     to,

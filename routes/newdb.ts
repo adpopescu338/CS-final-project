@@ -1,33 +1,45 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { AuthedRequest } from 'libs/types';
 import { mongoManager, mysqlManager, postgresManager, DatabaseType } from '../databases';
 import * as yup from 'yup';
-import { asyncHandler } from 'libs/middleware';
+import { asyncHandler, validate } from 'libs/middleware';
+import { v4 as uuid } from 'uuid';
+import { client } from 'prisma/client';
+import { BeError } from 'libs/BeError';
+import { ErrorCodes, MAX_DATABASES_PER_USER, MAX_DATABASES_ACC_SIZE } from 'libs/constants';
 
-const getNewUser = (body: any) =>
-  ({
-    username: body.username + Math.random().toString(36).substring(7),
-    password: body.password,
-    database: 'db_' + body.username + Math.random().toString(36).substring(7),
-  } as any);
-
-const createUser =
+const createDbAndUser =
   (dbManager: typeof mongoManager | typeof mysqlManager | typeof postgresManager) =>
-  async (req: Request, res: Response) => {
-    const newUser = getNewUser(req.body);
+  async (req: AuthedRequest, res: Response) => {
+    const { name, email, id } = req.user;
+    const { database } = req.body;
 
-    const user = await dbManager.createDbAndUser({
-      username: newUser.username,
-      password: newUser.password,
-      database: newUser.database,
-    });
-    console.log('user', user);
+    const newUser = {
+      username: `${name}_${email}`,
+      password: uuid().slice(0, 8),
+      database: `${name}_${database}_${uuid().slice(0, 8)}`,
+    };
+
+    const dbDetails = await dbManager.createDbAndUser(newUser);
+
     const success = await dbManager.checkUserCreation({
       user: newUser.username,
       password: newUser.password,
       database: newUser.database,
     });
 
-    if (success) return res.status(200).send(user);
+    if (success) {
+      await client.database.create({
+        data: {
+          name: newUser.database,
+          userId: id,
+        },
+      });
+      return res.status(200).send({
+        message: 'User created successfully',
+        data: dbDetails,
+      });
+    }
 
     await Promise.all([
       dbManager.deleteUser(newUser.username),
@@ -39,22 +51,46 @@ const createUser =
     });
   };
 
-export const main = (req, res) => {
-  const { type } = req.params;
+const checkIfUserCanCreateDb = async (userId: string) => {
+  const databases = await client.database.findMany({
+    where: {
+      userId,
+    },
+  });
 
-  if (type === DatabaseType.mongo) return createUser(mongoManager)(req, res);
-  if (type === DatabaseType.mysql) return createUser(mysqlManager)(req, res);
-  if (type === DatabaseType.postgres) return createUser(postgresManager)(req, res);
+  if (!databases?.length) return;
+
+  if (databases.length > MAX_DATABASES_PER_USER)
+    throw new BeError('You have reached the maximum number of databases', ErrorCodes.Forbidden);
+
+  const accumulatedSize = databases.reduce((acc, curr) => acc + curr.size, 0);
+
+  if (accumulatedSize >= MAX_DATABASES_ACC_SIZE)
+    throw new BeError(
+      `You have reached the maximum size of ${MAX_DATABASES_ACC_SIZE} MB`,
+      ErrorCodes.Forbidden
+    );
 };
 
-export const schema: yup.Schema = yup.object().shape({
+const main = async (req: AuthedRequest, res: Response) => {
+  const { type } = req.params;
+  const { user } = req;
+
+  await checkIfUserCanCreateDb(user.id);
+
+  if (type === DatabaseType.mongo) return createDbAndUser(mongoManager)(req, res);
+  if (type === DatabaseType.mysql) return createDbAndUser(mysqlManager)(req, res);
+  if (type === DatabaseType.postgres) return createDbAndUser(postgresManager)(req, res);
+};
+
+const schema: yup.Schema = yup.object().shape({
   body: yup.object().shape({
-    username: yup.string().required(),
-    password: yup.string().required(),
+    database: yup.string().required(),
   }),
   params: yup.object().shape({
     type: yup.string().required(),
   }),
 });
 
+export const validateReq = validate(schema);
 export const handler = asyncHandler(main);

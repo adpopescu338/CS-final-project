@@ -17,7 +17,9 @@ export const createDbAndUser = async (
   }
 
   return {
-    connectionUrl: `mongodb://${username}:${password}@${process.env.MONGO_HOST}:${MONGO_PORT}/${database}`,
+    connectionUrl: `mongodb://${username}:${password}@${process.env.MONGO_PUBLIC_HOST}:${MONGO_PORT}/${database}`,
+    port: MONGO_PORT,
+    host: process.env.MONGO_PUBLIC_HOST as string,
     username,
     password,
     database,
