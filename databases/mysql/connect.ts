@@ -1,18 +1,22 @@
 import mysql, { Connection } from 'mysql2';
-import { ConnectionDetails } from '../DBManager';
+import { ConnectionDetails, InternalConnectionDetails } from '../DBManager';
 import { MYSQL_PORT } from 'libs/constants/backend';
 
 const connectionsMap = new Map();
 
-const getDefaultConnectionDetails = (details?: Partial<ConnectionDetails>): ConnectionDetails => ({
-  host: process.env.MYSQL_HOST as string,
+const getDefaultConnectionDetails = (
+  details: ConnectionDetails | InternalConnectionDetails
+): ConnectionDetails => ({
   password: process.env.MYSQL_PASSWORD as string,
   user: 'root',
   port: MYSQL_PORT,
   ...details,
+  host: details.host,
 });
 
-export const connect = (connectionDetails?: ConnectionDetails): Promise<Connection> => {
+export const connect = (
+  connectionDetails: ConnectionDetails | InternalConnectionDetails
+): Promise<Connection> => {
   connectionDetails = getDefaultConnectionDetails(connectionDetails);
   const connectionKey = JSON.stringify(connectionDetails);
 

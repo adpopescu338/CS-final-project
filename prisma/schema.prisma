@@ -24,11 +24,33 @@ model User {
 
 model Database {
   id        String   @id @default(uuid())
+  type      DBMS
   name      String
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
   userId    String
   size      Int      @default(0)
+  pod       Pod      @relation(fields: [podId], references: [id])
+  podId     String
+
+  @@unique([name, podId])
+}
+
+model Pod {
+  id              String     @id @default(uuid())
+  deploymentName  String     @unique
+  serviceName     String     @unique
+  pvcName         String     @unique
+  createdAt       DateTime   @default(now())
+  databases       Database[]
+  publicIp        String? // Not available straight away
+  internalAddress String
+}
+
+enum DBMS {
+  mongodb
+  mysql
+  postgresql
 }
 
 model RefreshToken {

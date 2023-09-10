@@ -1,18 +1,22 @@
 import pg from 'pg';
-import { ConnectionDetails } from '../DBManager';
+import { ConnectionDetails, InternalConnectionDetails } from '../DBManager';
 import { POSTGRES_PORT } from 'libs/constants/backend';
 
-const getDefaultConnectionDetails = (details?: Partial<ConnectionDetails>): ConnectionDetails => ({
-  host: process.env.POSTGRES_HOST as string,
+const getDefaultConnectionDetails = (
+  details: ConnectionDetails | InternalConnectionDetails
+): ConnectionDetails => ({
   password: process.env.POSTGRES_PASSWORD as string,
   user: 'postgres',
   port: POSTGRES_PORT,
   ...details,
+  host: details.host,
 });
 
 const connectionsMap = new Map();
 
-export const connect = (connectionDetails?: ConnectionDetails): Promise<pg.Client> => {
+export const connect = (
+  connectionDetails: ConnectionDetails | InternalConnectionDetails
+): Promise<pg.Client> => {
   connectionDetails = getDefaultConnectionDetails(connectionDetails);
 
   const connectionKey = JSON.stringify(connectionDetails);
