@@ -16,4 +16,4 @@ const Signup = ({ name, otp }: SignUpProps) => {
   );
 };
 
-export const renderSignup = (props: SignUpProps) => render(<Signup {...props} />);
+export const renderTemplate = (props: SignUpProps) => render(<Signup {...props} />);

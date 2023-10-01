@@ -11,11 +11,15 @@ export type UserCreatedDetails = UserDetails & {
 };
 
 export type ConnectionDetails = {
-  host?: string;
+  host: string;
   user: string;
   password: string;
   port?: number;
   database?: string;
+};
+
+export type InternalConnectionDetails = Partial<ConnectionDetails> & {
+  host: string;
 };
 
 export interface DBManager<Client> {
@@ -24,7 +28,7 @@ export interface DBManager<Client> {
    * @param connectionDetails optional connection details. If not provided, will connect as admin
    * @returns a promise that resolves to the client
    */
-  connect(connectionDetails?: ConnectionDetails): Promise<Client>;
+  connect(connectionDetails: ConnectionDetails | InternalConnectionDetails): Promise<Client>;
 
   /**
    * @description Create a database and user with all privileges on that database
@@ -33,19 +37,22 @@ export interface DBManager<Client> {
    * @param userDetails.database the database to create the user for
    * @returns a promise that resolves to the user details and the connection url
    */
-  createDbAndUser(userDetails: UserDetails): Promise<UserCreatedDetails>;
+  createDbAndUser(
+    userDetails: UserDetails,
+    connectionDetails: InternalConnectionDetails
+  ): Promise<UserCreatedDetails>;
 
   /**
    * @description Delete a user from the database
    * @param username the username of the user to delete
    */
-  deleteUser(username: string): Promise<void>;
+  deleteUser(username: string, connectionDetails: InternalConnectionDetails): Promise<void>;
 
   /**
    * @description Delete a database
    * @param databaseName the name of the database to delete
    */
-  deleteDatabase(databaseName: string): Promise<void>;
+  deleteDatabase(databaseName: string, connectionDetails: InternalConnectionDetails): Promise<void>;
 
   /**
    * @description Check if a user was created successfully

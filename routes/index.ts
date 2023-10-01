@@ -11,4 +11,11 @@ router.post('/signin', handleSignIn.validateReq, handleSignIn.handler);
 router.post('/confirm-otp', handleConfirmOtp.validateReq, handleConfirmOtp.handler);
 router.post('/refresh-token', handleRefreshToken.validateReq, handleRefreshToken.handler);
 
+// TEST
+router.get('/hello', (req, res) => {
+  res.send({
+    message: 'Hello World!',
+  });
+});
+
 export { router };
