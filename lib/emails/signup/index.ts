@@ -1,4 +1,4 @@
-import { renderSignup } from './template';
+import { renderTemplate } from './template';
 import { sendMail } from '../sendMail';
 
 type SendEmailArgs = {
@@ -8,7 +8,7 @@ type SendEmailArgs = {
 };
 
 export const sendSignupEmail = async ({ to, name, otp }: SendEmailArgs): Promise<void> => {
-  const html = renderSignup({ name, otp });
+  const html = renderTemplate({ name, otp });
   console.log('html', html);
   return sendMail({
     to,

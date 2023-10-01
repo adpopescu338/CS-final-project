@@ -9,6 +9,8 @@ import { BeError } from 'libs/BeError';
 import { ErrorCodes, MAX_DATABASES_PER_USER, MAX_DATABASES_ACC_SIZE } from 'libs/constants';
 import { getAvailableService, deploy } from 'libs/k8';
 import { Pod } from '@prisma/client';
+import { sendDbCreatedEmail } from 'libs/emails';
+import { encrypt } from 'libs/utils';
 
 const revert = async (
   dbManager: typeof mongoManager | typeof mysqlManager | typeof postgresManager,
@@ -59,13 +61,16 @@ const createDbAndUser =
       host: pod.internalAddress,
     };
 
-    await dbManager.createDbAndUser(newUser, internalConnectionDetails);
+    const userConnectionDetails = await dbManager.createDbAndUser(
+      newUser,
+      internalConnectionDetails
+    );
 
     const success = await dbManager.checkUserCreation({
-      user: newUser.username,
-      password: newUser.password,
-      database: newUser.database,
-      host: internalConnectionDetails.host,
+      user: userConnectionDetails.username,
+      password: userConnectionDetails.password,
+      database: userConnectionDetails.database,
+      host: userConnectionDetails.host,
     });
 
     if (!success) {
@@ -81,10 +86,13 @@ const createDbAndUser =
       });
     }
 
-    await client.database.create({
+    const { id: databaseId } = await client.database.create({
       data: {
         type: dbType,
         name: newUser.database,
+        encryptedPassword: encrypt(userConnectionDetails.password),
+        encryptedConnectionUrl: encrypt(userConnectionDetails.connectionUrl),
+        encryptedUsername: encrypt(userConnectionDetails.username),
         pod: {
           connect: {
             id: pod.id,
@@ -96,9 +104,29 @@ const createDbAndUser =
           },
         },
       },
+      select: { id: true },
     });
 
-    // TODO: Send email with credentials
+    if (pod.publicIp) {
+      await sendDbCreatedEmail({
+        to: email,
+        database: userConnectionDetails.database,
+        dbms: dbType,
+        host: pod.publicIp,
+        username: userConnectionDetails.username,
+        password: userConnectionDetails.password,
+        port: userConnectionDetails.port,
+        connectionString: userConnectionDetails.connectionUrl,
+      });
+    } else {
+      await client.scheduledEmail.create({
+        data: {
+          to: email,
+          podId: pod.id,
+          databaseId,
+        },
+      });
+    }
 
     res.status(200).send({
       message: 'User created successfully. You will receive an email with your credentials shortly',

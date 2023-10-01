@@ -1,6 +1,7 @@
 node_modules
 .env
 .dist
+.client-dist
 notes.md
 yarn-debug.log*
 yarn-error.log*
@@ -10,3 +11,5 @@ client/.env
 client/build
 client/yarn-debug.log*
 client/yarn-error.log*
+
+.vscode
