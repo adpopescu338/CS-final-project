@@ -14,6 +14,19 @@ const getPort = (db: DBMS) => {
   }
 };
 
+const getDockerImageName = (db: DBMS) => {
+  switch (db) {
+    case DBMS.mongodb:
+      return 'mongo';
+    case DBMS.postgresql:
+      return 'postgres';
+    case DBMS.mysql:
+      return 'mysql';
+    default:
+      throw new Error('Invalid DBMS');
+  }
+};
+
 const getDeployment = (db: DBMS, identifier: string) => {
   let envs;
   switch (db) {
@@ -96,7 +109,7 @@ const getDeployment = (db: DBMS, identifier: string) => {
           containers: [
             {
               name: `${db}-${identifier}`,
-              image: `${db}:latest`,
+              image: `${getDockerImageName(db)}:latest`,
               ports: [
                 {
                   containerPort: getPort(db),

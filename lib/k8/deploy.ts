@@ -6,15 +6,19 @@ import { waitFor } from 'libs/utils';
 import { getServiceInternalAddress } from './getServiceInternalAddress';
 
 const isPodReady = async (podName: string, retries = 0) => {
-  const pod = await coreApi.readNamespacedPod(podName, 'default');
-  if (pod.body.status?.phase === 'Running') {
-    return true;
-  }
+  try {
+    const pod = await coreApi.readNamespacedPod(podName, 'default');
+    if (pod.body.status?.phase === 'Running') {
+      return true;
+    }
 
-  if (retries > 30) {
-    return false;
+    if (retries > 10) {
+      return false;
+    }
+  } catch (error) {
+    console.log('pod not found', error.message);
   }
-
+  console.log('waiting for pod to be ready');
   await waitFor(4000);
 
   return isPodReady(podName);
@@ -47,11 +51,11 @@ export const deploy = async (db: DBMS) => {
     // Deploy Service
     await coreApi.createNamespacedService('default', service);
     console.log(`Service for ${name} created`);
-
+    console.log('waiting for pod to be ready');
     await waitFor(10000);
 
     const podIsReady = await isPodReady(deployment.metadata.name);
-
+    console.log('pod is ready', podIsReady);
     if (!podIsReady) {
       await revertDeployment(deployment.metadata.name, service.metadata.name, pvc.metadata.name);
     }

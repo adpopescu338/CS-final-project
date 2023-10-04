@@ -1,30 +1,14 @@
 import { Request, Response } from 'express';
-import * as yup from 'yup';
+
 import { BeError } from 'libs/BeError';
 import { ErrorCodes } from 'libs/constants';
 import { client } from 'prisma/client';
 import { hashPassword } from 'libs/utils';
 import { v4 as uuid } from 'uuid';
 import { sendSignupEmail } from 'libs/emails';
-import { asyncHandler, validate } from 'libs/middleware';
+import { ReqPayload, Result } from './schemas';
 
-type ReqPayload = {
-  body: {
-    name: string;
-    password: string;
-    email: string;
-  };
-};
-
-const schema: yup.Schema<ReqPayload> = yup.object().shape({
-  body: yup.object().shape({
-    name: yup.string().required(),
-    password: yup.string().required().min(8).matches(/[a-z]/).matches(/[A-Z]/).matches(/[0-9]/),
-    email: yup.string().email().required(),
-  }),
-});
-
-export const main = async (req: Request, res: Response) => {
+export const logic = async (req: Request, res: Response) => {
   const { name, password, email } = req.body as ReqPayload['body'];
 
   // check if user already exists
@@ -61,11 +45,10 @@ export const main = async (req: Request, res: Response) => {
     otp,
   });
 
-  res.status(201).send({
+  const result: Result = {
     message: 'User created successfully. Please verify your email',
     data: newUser,
-  });
-};
+  };
 
-export const validateReq = validate(schema);
-export const handler = asyncHandler(main);
+  res.status(201).send(result);
+};

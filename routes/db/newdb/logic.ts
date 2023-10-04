@@ -1,8 +1,6 @@
 import { Response } from 'express';
 import { AuthedRequest, DBMS } from 'libs/types';
-import { mongoManager, mysqlManager, postgresManager } from '../databases';
-import * as yup from 'yup';
-import { asyncHandler, validate } from 'libs/middleware';
+import { mongoManager, mysqlManager, postgresManager } from 'databases';
 import { v4 as uuid } from 'uuid';
 import { client } from 'prisma/client';
 import { BeError } from 'libs/BeError';
@@ -11,6 +9,7 @@ import { getAvailableService, deploy } from 'libs/k8';
 import { Pod } from '@prisma/client';
 import { sendDbCreatedEmail } from 'libs/emails';
 import { encrypt } from 'libs/utils';
+import { ReqPayload, Result } from './schemas';
 
 const revert = async (
   dbManager: typeof mongoManager | typeof mysqlManager | typeof postgresManager,
@@ -47,12 +46,12 @@ const createDbAndUser =
   (dbManager: typeof mongoManager | typeof mysqlManager | typeof postgresManager, dbType: DBMS) =>
   async (req: AuthedRequest, res: Response) => {
     const { name, email, id } = req.user;
-    const { database } = req.body as ReqPayload['body'];
+    const { databaseName } = req.body as ReqPayload['body'];
 
     const newUser = {
       username: `${name}_${email}`,
       password: uuid().slice(0, 8),
-      database: `${name}_${database}_${uuid().slice(0, 8)}`,
+      database: `${name}_${databaseName}_${uuid().slice(0, 8)}`,
     };
 
     const pod = await getPodDetails(dbType);
@@ -128,9 +127,11 @@ const createDbAndUser =
       });
     }
 
-    res.status(200).send({
+    const result: Result = {
       message: 'User created successfully. You will receive an email with your credentials shortly',
-    });
+    };
+
+    res.status(200).send(result);
   };
 
 const checkIfUserCanCreateDb = async (userId: string) => {
@@ -154,7 +155,7 @@ const checkIfUserCanCreateDb = async (userId: string) => {
     );
 };
 
-const main = async (req: AuthedRequest, res: Response) => {
+export const logic = async (req: AuthedRequest, res: Response) => {
   const { type } = req.params as ReqPayload['params'];
   const { user } = req;
 
@@ -164,24 +165,3 @@ const main = async (req: AuthedRequest, res: Response) => {
   if (type === DBMS.mysql) return createDbAndUser(mysqlManager, type)(req, res);
   if (type === DBMS.postgresql) return createDbAndUser(postgresManager, type)(req, res);
 };
-
-type ReqPayload = {
-  body: {
-    database: string;
-  };
-  params: {
-    type: DBMS;
-  };
-};
-
-const schema: yup.Schema<ReqPayload> = yup.object().shape({
-  body: yup.object().shape({
-    database: yup.string().required(),
-  }),
-  params: yup.object().shape({
-    type: yup.mixed<DBMS>().oneOf(Object.values(DBMS)).required(),
-  }),
-});
-
-export const validateReq = validate(schema);
-export const handler = asyncHandler(main);

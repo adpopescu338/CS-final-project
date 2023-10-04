@@ -1,24 +1,11 @@
 import { Request, Response } from 'express';
-import * as yup from 'yup';
 import { BeError } from 'libs/BeError';
-import { ErrorCodes } from 'libs/constants';
+import { ErrorCodes, REFRESH_TOKEN_EXPIRE_IN, TOKEN_EXPIRE_IN } from 'libs/constants';
 
 import { SessionUser } from 'libs/types';
 import jwt from 'jsonwebtoken';
 import { client } from 'prisma/client';
-import { asyncHandler, validate } from 'libs/middleware';
-
-type ReqPayload = {
-  body: {
-    refreshToken: string;
-  };
-};
-
-const schema: yup.Schema<ReqPayload> = yup.object().shape({
-  body: yup.object().shape({
-    refreshToken: yup.string().required(),
-  }),
-});
+import { ReqPayload, Result } from './schemas';
 
 const getUserFromDbByToken = async (refreshToken: string) => {
   const token = await client.refreshToken.findUnique({
@@ -38,7 +25,7 @@ const getUserFromDbByToken = async (refreshToken: string) => {
   return token.user;
 };
 
-const main = async (req: Request, res: Response) => {
+export const logic = async (req: Request, res: Response) => {
   const { refreshToken } = req.body as ReqPayload['body'];
 
   const user = await getUserFromDbByToken(refreshToken);
@@ -56,10 +43,10 @@ const main = async (req: Request, res: Response) => {
   };
 
   const token = jwt.sign(sessionUser, process.env.JWT_SECRET as string, {
-    expiresIn: '1d',
+    expiresIn: `${TOKEN_EXPIRE_IN / 1000}s`,
   });
 
-  const { id: newRefreshToken } = await client.refreshToken.create({
+  const { id: newRefreshToken, expiresAt } = await client.refreshToken.create({
     data: {
       user: {
         connect: {
@@ -67,24 +54,25 @@ const main = async (req: Request, res: Response) => {
         },
       },
       // 7 days
-      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+      expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRE_IN),
     },
   });
 
-  res.cookie('authorization', token, {
+  res.cookie('token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'none',
+    sameSite: 'strict',
+    expires: new Date(Date.now() + TOKEN_EXPIRE_IN),
   });
 
-  res.status(200).send({
+  const result: Result = {
     message: 'User logged in successfully',
     data: {
       refreshToken: newRefreshToken,
       user: sessionUser,
+      expiresAt,
     },
-  });
-};
+  };
 
-export const validateReq = validate(schema);
-export const handler = asyncHandler(main);
+  res.status(200).send(result);
+};

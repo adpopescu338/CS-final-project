@@ -6,6 +6,7 @@ const statusCodes = {
   [ErrorCodes.Forbidden]: 403,
   [ErrorCodes.BadRequest]: 400,
   [ErrorCodes.InternalServerError]: 500,
+  [ErrorCodes.ResourceAlreadyExists]: 409,
 };
 
 export class BeError extends Error {
