@@ -52,11 +52,11 @@ export const logic = async (req: Request, res: Response) => {
     },
   });
 
-  res.cookie('authorization', token, {
+  res.cookie('token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'none',
-    maxAge: TOKEN_EXPIRE_IN,
+    sameSite: 'strict',
+    expires: new Date(Date.now() + TOKEN_EXPIRE_IN),
   });
 
   const result: Result = {

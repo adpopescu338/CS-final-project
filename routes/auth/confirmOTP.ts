@@ -66,7 +66,7 @@ const main = async (req: Request, res: Response) => {
   res.cookie('authorization', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'none',
+    sameSite: 'strict',
   });
 
   res.status(200).send({

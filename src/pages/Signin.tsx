@@ -1,10 +1,18 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { req } from 'src/lib/Req';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
+import Container from '@mui/material/Container';
+import Alert from '@mui/material/Alert';
 
 export const Signin = () => {
   const navigate = useNavigate();
   const [error, setError] = React.useState(null);
+  const [loading, setLoading] = React.useState(false);
   const [values, setValues] = React.useState({
     email: '',
     password: '',
@@ -12,42 +20,71 @@ export const Signin = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setLoading(true);
     try {
       await req.signin(values);
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
+
   return (
-    <div>
-      Signin
-      {error && <div>{error}</div>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email</label>
-          <input
-            onChange={(event) => {
-              setValues((v) => ({ ...v, email: event.target.value }));
-            }}
-            type="email"
-            required
-            name="email"
-          />
-        </div>
-        <div>
-          <label>Password</label>
-          <input
-            onChange={(event) => {
-              setValues((v) => ({ ...v, password: event.target.value }));
-            }}
-            type="password"
-            required
-            name="password"
-          />
-        </div>
-        <button type="submit">Signin</button>
-      </form>
-    </div>
+    <Container
+      component="main"
+      maxWidth="xs"
+      style={{
+        marginTop: '50px',
+      }}
+    >
+      <Typography component="h1" variant="h5">
+        Sign in
+      </Typography>
+      {error && <Alert severity="error">{error}</Alert>}
+      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+        <TextField
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          id="email"
+          label="Email Address"
+          name="email"
+          autoComplete="email"
+          autoFocus
+          value={values.email}
+          onChange={(event) => {
+            setValues((v) => ({ ...v, email: event.target.value }));
+          }}
+        />
+        <TextField
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          name="password"
+          label="Password"
+          type="password"
+          id="password"
+          autoComplete="current-password"
+          value={values.password}
+          onChange={(event) => {
+            setValues((v) => ({ ...v, password: event.target.value }));
+          }}
+        />
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          color="primary"
+          sx={{ mt: 3, mb: 2 }}
+          disabled={loading}
+        >
+          {loading ? <CircularProgress size={24} /> : 'Sign In'}
+        </Button>
+      </Box>
+    </Container>
   );
 };

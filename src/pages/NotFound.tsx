@@ -1,5 +1,10 @@
 import React from 'react';
+import { Typography } from '@mui/material';
 
 export const NotFound = () => {
-  return <h1>Not found</h1>;
+  return (
+    <div>
+      <Typography variant="h4">Page not found</Typography>
+    </div>
+  );
 };

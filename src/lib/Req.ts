@@ -1,7 +1,8 @@
 import axios from 'axios';
 import * as Signin from 'routes/auth/signin/schemas';
 import * as Me from 'routes/auth/me/schemas';
-import { ClientSession } from 'src/types';
+import * as Signup from 'routes/auth/signup/schemas';
+import * as NewDb from 'routes/db/newdb/schemas';
 
 class Requestor {
   private refreshToken = '';
@@ -10,8 +11,8 @@ class Requestor {
     return this.get('/api/hello');
   }
 
-  signup(data: { email: string; password: string }) {
-    return this.post('/api/signup', data);
+  signup(data: Signup.ReqPayload['body']) {
+    return this.post<Signup.Result>('/api/signup', data);
   }
 
   confirmOtp(otp: string) {
@@ -24,32 +25,21 @@ class Requestor {
   async signin(data: Signin.ReqPayload['body']): Promise<void> {
     const res = await this.post<Signin.Result>('/api/signin', data);
     this.refreshToken = res.data.refreshToken;
-    console.log('Signed in as', res.data.user);
 
-    // const { expiresAt } = res.data;
-    // const now = new Date();
-    const diff = 1000; //new Date(expiresAt).getTime() - now.getTime();
-
-    setTimeout(this.refreshAccessToken.bind(this), diff);
-    this.setSession({
-      status: 'authenticated',
-      user: res.data.user,
-    });
+    window.location.href = '/dashboard';
   }
 
   async me() {
-    const result = await this.get<Me.Result>('/api/me');
-    if (result.status === 'authenticated') {
-      this.setSession({
-        status: 'authenticated',
-        user: result.data,
-      });
-    } else {
-      this.setSession({
-        status: 'unauthenticated',
-        user: null,
-      });
-    }
+    return this.get<Me.Result>('/api/me');
+  }
+
+  async logout() {
+    await this.get('/api/logout');
+    window.location.reload();
+  }
+
+  createNewDb(body: NewDb.ReqPayload['body'], { type }: NewDb.ReqPayload['params']) {
+    return this.post<NewDb.Result>(`/api/newdb/${type}`, body);
   }
 
   private async refreshAccessToken() {
@@ -69,6 +59,11 @@ class Requestor {
         const res = await axios.post(...args);
         return res.data;
       }
+      console.error(`An error occurred while making a GET request to ${args[0]}`, e);
+      if (e.response?.data?.message) {
+        // overwrite the error message, to display the one from the server
+        e['message'] = e.response.data.message;
+      }
       throw e;
     }
   }
@@ -83,12 +78,13 @@ class Requestor {
         const res = await axios.post(...args);
         return res.data;
       }
+      console.error(`An error occurred while making a GET request to ${args[0]}`, e);
+      if (e.response?.data?.message) {
+        // overwrite the error message, to display the one from the server
+        e['message'] = e.response.data.message;
+      }
       throw e;
     }
-  }
-
-  setSession(session: ClientSession) {
-    throw new Error('Method is not overridden');
   }
 }
 

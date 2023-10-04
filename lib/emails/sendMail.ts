@@ -7,7 +7,10 @@ type SendEmailArgs = {
 };
 export const sendMail = (args: SendEmailArgs): Promise<void> => {
   if (process.env.DISABLE_EMAILS === 'true') {
-    console.log('Emails disabled, not sending');
+    console.log(
+      `Emails disabled, not sending email for "${args.subject}" to ${args.to}. HTML:`,
+      args.html
+    );
     return Promise.resolve();
   }
   sendgrid.setApiKey(process.env.SENDGRID_API_KEY as string);

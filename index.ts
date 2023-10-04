@@ -6,12 +6,13 @@ import path from 'path';
 import { errorHandler } from './lib/middleware';
 import { setDbPublicIpAddress } from './lib/k8/setDbPublicIpAddress';
 import { checkMandatoryEnvVariables } from './lib/checkMandatoryEnvVariables';
+import cookies from 'cookie-parser';
 
 config();
 
 const app = express();
 app.use(cors());
-
+app.use(cookies());
 app.use(express.json());
 app.use('/api', router);
 app.use(errorHandler);

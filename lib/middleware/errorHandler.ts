@@ -1,7 +1,8 @@
 import { BeError } from '../BeError';
 
 export const errorHandler = (error, request, response, next) => {
-  console.error('e ====== ', error);
+  const path = request.path;
+  console.log(`Error occurred at ${path}: `, error);
 
   if (error instanceof BeError) {
     return response.status(error.statusCode).json({
