@@ -9,7 +9,7 @@ type SendEmailArgs = {
 
 export const sendSignupEmail = async ({ to, name, otp }: SendEmailArgs): Promise<void> => {
   const html = renderTemplate({ name, otp });
-  console.log('html', html);
+
   return sendMail({
     to,
     subject: 'Welcome to the app!',

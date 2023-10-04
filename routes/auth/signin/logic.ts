@@ -1,26 +1,11 @@
 import { Request, Response } from 'express';
-import * as yup from 'yup';
 import { BeError } from 'libs/BeError';
-import { ErrorCodes } from 'libs/constants';
-import { asyncHandler, validate } from 'libs/middleware';
+import { ErrorCodes, REFRESH_TOKEN_EXPIRE_IN, TOKEN_EXPIRE_IN } from 'libs/constants';
 import { SessionUser } from 'libs/types';
 import jwt from 'jsonwebtoken';
 import { client } from 'prisma/client';
 import bcrypt from 'bcryptjs';
-
-type ReqPayload = {
-  body: {
-    password: string;
-    email: string;
-  };
-};
-
-const schema: yup.Schema<ReqPayload> = yup.object().shape({
-  body: yup.object().shape({
-    password: yup.string().required().min(8).matches(/[a-z]/).matches(/[A-Z]/).matches(/[0-9]/),
-    email: yup.string().email().required(),
-  }),
-});
+import { ReqPayload, Result } from './schemas';
 
 const getUserFromDb = async (email: string, password: string) => {
   const user = await client.user.findUnique({
@@ -40,7 +25,7 @@ const getUserFromDb = async (email: string, password: string) => {
   return user;
 };
 
-const main = async (req: Request, res: Response) => {
+export const logic = async (req: Request, res: Response) => {
   const { password, email } = req.body as ReqPayload['body'];
 
   const user = await getUserFromDb(email, password);
@@ -52,10 +37,10 @@ const main = async (req: Request, res: Response) => {
   };
 
   const token = jwt.sign(sessionUser, process.env.JWT_SECRET as string, {
-    expiresIn: '1d',
+    expiresIn: `${TOKEN_EXPIRE_IN / 1000}s`,
   });
 
-  const { id: refreshToken } = await client.refreshToken.create({
+  const { id: refreshToken, expiresAt } = await client.refreshToken.create({
     data: {
       user: {
         connect: {
@@ -63,7 +48,7 @@ const main = async (req: Request, res: Response) => {
         },
       },
       // 7 days
-      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+      expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRE_IN),
     },
   });
 
@@ -71,16 +56,17 @@ const main = async (req: Request, res: Response) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'none',
+    maxAge: TOKEN_EXPIRE_IN,
   });
 
-  res.status(200).send({
+  const result: Result = {
     message: 'User logged in successfully',
     data: {
       refreshToken,
       user: sessionUser,
+      expiresAt,
     },
-  });
-};
+  };
 
-export const validateReq = validate(schema);
-export const handler = asyncHandler(main);
+  res.status(200).send(result);
+};

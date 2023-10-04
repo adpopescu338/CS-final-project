@@ -1,7 +1,7 @@
-import { useRef } from 'react';
 import styled from 'styled-components';
 import React from 'react';
 import { req } from 'src/lib/Req';
+import { useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
   display: flex;
@@ -45,41 +45,85 @@ const Container = styled.div`
 `;
 
 export const Signup = () => {
-  const [emailRef, nameRef, passwordRef] = [
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-  ];
+  const navigate = useNavigate();
+  const [error, setError] = React.useState(null);
+  const [step, setStep] = React.useState(0);
+  const [values, setValues] = React.useState({
+    email: '',
+    name: '',
+    password: '',
+    otp: '',
+  });
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const getInputProps = (name: string) => ({
+    name,
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+      setValues((v) => ({ ...v, [name]: event.target.value }));
+    },
+    value: values[name],
+    required: true,
+  });
+
+  const handleDetailsSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const values = {
-      email: emailRef.current?.value as string,
-      name: nameRef.current?.value as string,
-      password: passwordRef.current?.value as string,
-    };
-
-    req.signup(values).then(console.log);
+    try {
+      await req.signup(values);
+      setStep(1);
+    } catch (err) {
+      setError(err.message);
+    }
   };
+
+  const handleOtpSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    try {
+      await req.confirmOtp(values.otp);
+      setStep(2);
+      await req.signin(values);
+
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 2000);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const steps = [
+    <form onSubmit={handleDetailsSubmit}>
+      <h4>Please enter your details</h4>
+      <div>
+        <label htmlFor="email">Email</label>
+        <input {...getInputProps('email')} />
+      </div>
+      <div>
+        <label htmlFor="name">Name</label>
+        <input {...getInputProps('name')} />
+      </div>
+      <div>
+        <label htmlFor="password">Password</label>
+        <input {...getInputProps('password')} type="password" />
+      </div>
+      <button type="submit">Signup</button>
+    </form>,
+    <form onSubmit={handleOtpSubmit}>
+      <h4>Please enter the OTP sent to your email</h4>
+      <div>
+        <label htmlFor="otp">OTP</label>
+        <input {...getInputProps('otp')} />
+      </div>
+      <button type="submit">Verify</button>
+    </form>,
+    <div>
+      <h4>Signup successful. Welcome!</h4>
+    </div>,
+  ];
 
   return (
     <Container>
-      <h1>Signup</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email</label>
-          <input ref={emailRef} id="email" type="email" required />
-        </div>
-        <div>
-          <label htmlFor="name">Name</label>
-          <input ref={nameRef} id="name" type="text" required />
-        </div>
-        <div>
-          <label htmlFor="password">Password</label>
-          <input ref={passwordRef} id="password" type="password" required />
-        </div>
-        <button type="submit">Signup</button>
-      </form>
+      {error && <div>{error}</div>}
+      {steps[step]}
     </Container>
   );
 };

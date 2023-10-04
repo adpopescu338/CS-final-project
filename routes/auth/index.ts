@@ -1,4 +1,5 @@
 export * as handleConfirmOtp from './confirmOTP';
-export * as handleSignIn from './signin';
+export { default as handleSignIn } from './signin';
 export * as handleSignUp from './signup';
-export * as handleRefreshToken from './refreshToken';
+export { default as handleRefreshToken } from './refreshToken';
+export { default as meHandler } from './me';
