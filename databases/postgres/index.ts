@@ -4,6 +4,8 @@ import { deleteUser } from './deleteUser';
 import { deleteDatabase } from './deleteDatabase';
 import { Client } from 'pg';
 import { DBManager, ConnectionDetails, UserDetails, InternalConnectionDetails } from '../DBManager';
+import { getWholeDbSize } from './getWholeDbSize';
+import { createDbForExistingUser } from './createDbForExistingUser';
 
 class PostgresManager implements DBManager<Client> {
   connect(connectionDetails: ConnectionDetails | InternalConnectionDetails) {
@@ -13,6 +15,14 @@ class PostgresManager implements DBManager<Client> {
   async createDbAndUser(userDetails: UserDetails, connectionDetails: InternalConnectionDetails) {
     const client = await this.connect(connectionDetails);
     return createDbAndUser(client, userDetails);
+  }
+
+  async createDbForExistingUser(
+    userDetails: UserDetails,
+    connectionDetails: InternalConnectionDetails
+  ) {
+    const client = await this.connect(connectionDetails);
+    return createDbForExistingUser(client, userDetails);
   }
 
   async deleteUser(username: string, connectionDetails: InternalConnectionDetails) {
@@ -32,6 +42,11 @@ class PostgresManager implements DBManager<Client> {
     } catch (e) {
       return false;
     }
+  }
+
+  async getWholeDbSize(connectionDetails: InternalConnectionDetails) {
+    const db = await this.connect(connectionDetails);
+    return getWholeDbSize(db);
   }
 }
 

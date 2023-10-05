@@ -6,6 +6,7 @@ import { SessionUser } from 'libs/types';
 import jwt from 'jsonwebtoken';
 import { client } from 'prisma/client';
 import { ReqPayload, Result } from './schemas';
+import { getTokenCookieOptions } from 'libs/utils';
 
 const getUserFromDbByToken = async (refreshToken: string) => {
   const token = await client.refreshToken.findUnique({
@@ -58,12 +59,7 @@ export const logic = async (req: Request, res: Response) => {
     },
   });
 
-  res.cookie('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    expires: new Date(Date.now() + TOKEN_EXPIRE_IN),
-  });
+  res.cookie('token', token, getTokenCookieOptions());
 
   const result: Result = {
     message: 'User logged in successfully',

@@ -1,26 +1,22 @@
 import { Router } from 'express';
-import { newDbHandler } from './db';
-import {
-  handleConfirmOtp,
-  handleSignIn,
-  handleSignUp,
-  handleRefreshToken,
-  meHandler,
-  logoutHandler,
-} from './auth';
-import { auth } from 'libs/middleware';
-
+import * as db from './db';
+import * as auth from './auth';
+import { buildEndpoint } from 'libs/utils/buildEndpoint';
+import { EndpointDetails } from 'libs/types';
 const router = Router();
 
-router.post('/newdb/:type', auth, newDbHandler.validate, newDbHandler.handler);
-router.post('/signup', handleSignUp.validate, handleSignUp.handler);
-router.post('/signin', handleSignIn.validate, handleSignIn.handler);
-router.post('/confirm-otp', handleConfirmOtp.validateReq, handleConfirmOtp.handler);
-router.post('/refresh-token', handleRefreshToken.validate, handleRefreshToken.handler);
-router.get('/logout', logoutHandler);
-router.get('/me', meHandler.handler);
+const allEndpoints = {
+  ...auth,
+  ...db,
+};
 
-// TEST
+Object.values(allEndpoints).forEach((details: EndpointDetails) => {
+  const endpoint = buildEndpoint(details);
+  //@ts-expect-error
+  router[details.method](...endpoint);
+});
+
+
 router.get('/hello', (req, res) => {
   res.send({
     message: 'Hello World!',

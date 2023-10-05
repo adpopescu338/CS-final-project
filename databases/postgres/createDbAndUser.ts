@@ -8,20 +8,25 @@ export const createDbAndUser = async (
 ): Promise<UserCreatedDetails> => {
   return new Promise((resolve, reject) => {
     // Create a new database
+
     client.query(`CREATE DATABASE ${database}`, (err) => {
-      if (err) reject(err);
+      if (err) return reject(err);
       console.log('Database created!');
 
       // Create a new user
       client.query(`CREATE USER ${username} WITH PASSWORD '${password}'`, (err) => {
         if (err) {
           // revert changes
+          console.log('Error creating user', err);
           client.query(`DROP DATABASE ${database}`, (err) => {
-            if (err) reject(err);
+            if (err) {
+              console.log('Error deleting database', err);
+              return;
+            }
             console.log('Database deleted!');
           });
 
-          reject(err);
+          return reject(err);
         }
         console.log('User created!');
 
@@ -29,17 +34,24 @@ export const createDbAndUser = async (
         client.query(`GRANT ALL PRIVILEGES ON DATABASE ${database} TO ${username}`, (err) => {
           if (err) {
             // revert changes
+            console.log('Error granting privileges', err);
             client.query(`DROP DATABASE ${database}`, (err) => {
-              if (err) reject(err);
+              if (err) {
+                console.log('Error deleting database', err);
+                return;
+              }
               console.log('Database deleted!');
             });
 
             client.query(`DROP USER ${username}`, (err) => {
-              if (err) reject(err);
+              if (err) {
+                console.log('Error deleting user', err);
+                return;
+              }
               console.log('User deleted!');
             });
 
-            reject(err);
+            return reject(err);
           }
           console.log('Read/write access granted!');
 

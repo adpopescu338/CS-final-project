@@ -3,15 +3,13 @@ import * as yup from 'yup';
 
 export type ReqPayload = {
   body: {
-    password: string;
-    email: string;
+    otp: string;
   };
 };
 
 export const schema: yup.Schema<ReqPayload> = yup.object().shape({
   body: yup.object().shape({
-    password: yup.string().required().min(8).matches(/[a-z]/).matches(/[A-Z]/).matches(/[0-9]/),
-    email: yup.string().email().required(),
+    otp: yup.string().required(),
   }),
 });
 
@@ -20,8 +18,7 @@ export type Result = {
   data: {
     refreshToken: string;
     user: SessionUser;
-    expiresAt: Date;
   };
 };
 
-export const path = 'signin'
+export const path = 'confirm-otp';

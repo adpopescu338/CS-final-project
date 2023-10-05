@@ -25,7 +25,7 @@ export const connect = (
     console.log('Connection already exists!');
     return connectionsMap.get(connectionKey);
   }
-
+  console.log(`Creating new connection to postgres for user ${connectionDetails.user}!`);
   const client = new pg.Client(connectionDetails);
 
   // This will replace the 'end' event listener for the MySQL connection

@@ -5,29 +5,51 @@ import { client } from 'prisma/client';
 import { waitFor } from 'libs/utils';
 import { getServiceInternalAddress } from './getServiceInternalAddress';
 
-const isPodReady = async (podName: string, retries = 0) => {
+const MAX_RETRIES = 20;
+const isPodReady = async (deploymentName: string, retries = 0) => {
   try {
-    const pod = await coreApi.readNamespacedPod(podName, 'default');
-    if (pod.body.status?.phase === 'Running') {
+    const {
+      body: { items },
+    } = await coreApi.listNamespacedPod(
+      'default',
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined
+    );
+
+    // https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-phase
+    const itemsForDeployment = items?.filter((i) => {
+      return i?.metadata?.generateName?.startsWith(deploymentName);
+    });
+    const itemRunning = itemsForDeployment?.some((i) => i?.status?.phase === 'Running');
+    if (itemRunning) {
+      console.log(`pod for ${deploymentName} is ready`);
       return true;
     }
 
-    if (retries > 10) {
+    if (retries > MAX_RETRIES) {
       return false;
     }
   } catch (error) {
-    console.log('pod not found', error.message);
+    console.log(`pod for ${deploymentName} not found`, error.message);
   }
-  console.log('waiting for pod to be ready');
-  await waitFor(4000);
+  console.log(`waiting for pod for ${deploymentName} to be ready`);
+  await waitFor(5000);
 
-  return isPodReady(podName);
+  return isPodReady(deploymentName, retries + 1);
 };
 
 const revertDeployment = async (deploymentName: string, serviceName: string, pvcName: string) => {
-  await appsV1Api.deleteNamespacedDeployment(deploymentName, 'default');
-  await coreApi.deleteNamespacedService(serviceName, 'default');
-  await coreApi.deleteNamespacedPersistentVolumeClaim(pvcName, 'default');
+  try {
+    console.log('reverting deployment...');
+    await appsV1Api.deleteNamespacedDeployment(deploymentName, 'default');
+    await coreApi.deleteNamespacedService(serviceName, 'default');
+    await coreApi.deleteNamespacedPersistentVolumeClaim(pvcName, 'default');
+  } catch (error) {
+    console.error('Error reverting deployment', error);
+  }
 };
 
 /**
@@ -35,6 +57,7 @@ const revertDeployment = async (deploymentName: string, serviceName: string, pvc
  * @returns The ID of the newly created pod entry in the database
  */
 export const deploy = async (db: DBMS) => {
+  console.log('deploying new pod for ', db);
   const identifier = Date.now().toString();
   const { deployment, service, pvc } = getDeploymentData(db, identifier);
 
@@ -58,6 +81,7 @@ export const deploy = async (db: DBMS) => {
     console.log('pod is ready', podIsReady);
     if (!podIsReady) {
       await revertDeployment(deployment.metadata.name, service.metadata.name, pvc.metadata.name);
+      throw new Error('Pod is not ready');
     }
 
     const deplymentDetails = await client.pod.create({

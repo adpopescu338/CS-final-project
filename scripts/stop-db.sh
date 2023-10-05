@@ -1,1 +1,2 @@
 minikube stop
+minikube delete

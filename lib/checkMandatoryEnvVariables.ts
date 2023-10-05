@@ -16,6 +16,9 @@ const MANDATORY_ENV_VARIABLES = [
   'SENDGRID_FROM_EMAIL',
   //
   'JWT_SECRET',
+  'ENCRYPTION_KEY',
+  //
+  'NODE_ENV',
 ];
 
 export const checkMandatoryEnvVariables = () => {

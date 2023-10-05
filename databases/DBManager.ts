@@ -43,6 +43,14 @@ export interface DBManager<Client> {
   ): Promise<UserCreatedDetails>;
 
   /**
+   * @description Create a database for an existing user
+   */
+  createDbForExistingUser(
+    userDetails: UserDetails,
+    connectionDetails: InternalConnectionDetails
+  ): Promise<UserCreatedDetails>;
+
+  /**
    * @description Delete a user from the database
    * @param username the username of the user to delete
    */
@@ -60,4 +68,10 @@ export interface DBManager<Client> {
    * @returns a promise that resolves to true if the user was created successfully and false otherwise
    */
   checkUserCreation(connectionDetails: ConnectionDetails): Promise<boolean>;
+
+  /**
+   * @deprecated Returns the of the entire database in megabytes
+   * The connection details are going to be the same for all databases (the admin user), but the host can be different
+   */
+  getWholeDbSize(connectionDetails: InternalConnectionDetails): Promise<number>;
 }

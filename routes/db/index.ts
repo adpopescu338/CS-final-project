@@ -1,1 +1,1 @@
-export { default as newDbHandler } from './newdb';
+export * as newDb from './newdb';

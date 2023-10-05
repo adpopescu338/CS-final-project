@@ -24,7 +24,8 @@ export const connect = (
     console.log('Connection already exists!');
     return connectionsMap.get(connectionKey);
   }
-  // Replace the connection settings with your MySQL configuration
+  console.log(`Creating new connection to postgres for user ${connectionDetails.user}!`);
+
   const connection = mysql.createConnection({
     host: connectionDetails.host,
     user: connectionDetails.user,

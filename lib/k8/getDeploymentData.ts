@@ -1,4 +1,4 @@
-import { MONGO_PORT, MYSQL_PORT, POSTGRES_PORT } from 'libs/constants';
+import { MONGO_PORT, MYSQL_PORT, POSTGRES_PORT, POD_STORAGE_GIGA } from 'libs/constants';
 import { DBMS } from 'libs/types';
 
 const getPort = (db: DBMS) => {
@@ -90,6 +90,7 @@ const getDeployment = (db: DBMS, identifier: string) => {
       labels: {
         serviceName: `${db}-${identifier}-service`,
         pvcName: `${db}-${identifier}-pvc`,
+        deploymentName: `${db}-deployment-${identifier}`,
       },
     },
     spec: {
@@ -146,6 +147,7 @@ const getService = (db: DBMS, identifier: string) => ({
     labels: {
       deploymentName: `${db}-deployment-${identifier}`,
       pvcName: `${db}-${identifier}-pvc`,
+      serviceName: `${db}-${identifier}-service`,
     },
   },
   spec: {
@@ -162,7 +164,7 @@ const getService = (db: DBMS, identifier: string) => ({
   },
 });
 
-const getPvc = (db: DBMS, identifier: string, storage = '1Gi') => ({
+const getPvc = (db: DBMS, identifier: string, storage = `${POD_STORAGE_GIGA}Gi`) => ({
   apiVersion: 'v1',
   kind: 'PersistentVolumeClaim',
   metadata: {
@@ -170,6 +172,7 @@ const getPvc = (db: DBMS, identifier: string, storage = '1Gi') => ({
     labels: {
       deploymentName: `${db}-deployment-${identifier}`,
       serviceName: `${db}-${identifier}-service`,
+      pvcName: `${db}-${identifier}-pvc`,
     },
   },
   spec: {

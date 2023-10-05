@@ -11,3 +11,5 @@ export type Result =
       data: null;
       status: 'unauthenticated';
     };
+
+export const path = 'me';

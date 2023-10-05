@@ -4,6 +4,8 @@ import { deleteUser } from './deleteUser';
 import { deleteDatabase } from './deleteDatabase';
 import { MongoClient } from 'mongodb';
 import { DBManager, ConnectionDetails, UserDetails, InternalConnectionDetails } from '../DBManager';
+import { getWholeDbSize } from './getWholeDbSize';
+import { createDbForExistingUser } from './createDbForExistingUser';
 
 class MongoManager implements DBManager<MongoClient> {
   connect(connectionDetails: ConnectionDetails | InternalConnectionDetails) {
@@ -13,6 +15,14 @@ class MongoManager implements DBManager<MongoClient> {
   async createDbAndUser(userDetails: UserDetails, connectionDetails: InternalConnectionDetails) {
     const client = await this.connect(connectionDetails);
     return createDbAndUser(client, userDetails);
+  }
+
+  async createDbForExistingUser(
+    userDetails: UserDetails,
+    connectionDetails: InternalConnectionDetails
+  ) {
+    const client = await this.connect(connectionDetails);
+    return createDbForExistingUser(client, userDetails);
   }
 
   async deleteUser(username: string, connectionDetails: InternalConnectionDetails) {
@@ -26,12 +36,18 @@ class MongoManager implements DBManager<MongoClient> {
   }
 
   async checkUserCreation(connectionDetails: ConnectionDetails) {
+    console.log('checking user creation', connectionDetails);
     try {
       await this.connect(connectionDetails);
       return true;
     } catch (e) {
       return false;
     }
+  }
+
+  async getWholeDbSize(connectionDetails: InternalConnectionDetails) {
+    const db = await this.connect(connectionDetails);
+    return getWholeDbSize(db);
   }
 }
 

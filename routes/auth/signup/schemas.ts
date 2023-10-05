@@ -21,3 +21,5 @@ export type Result = {
   message: string;
   data: Pick<User, 'id' | 'email' | 'name' | 'createdAt'>;
 };
+
+export const path = 'signup';

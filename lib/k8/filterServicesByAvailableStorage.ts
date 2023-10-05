@@ -1,5 +1,6 @@
 import { DBMS } from '@prisma/client';
 import { coreApi } from './k8';
+import { writeFileSync } from 'fs';
 
 export const filterServicesByAvailableStorage = async (
   db: DBMS,
@@ -10,20 +11,29 @@ export const filterServicesByAvailableStorage = async (
     serviceName: string;
   }[]
 > => {
-  const pvcs = await coreApi.listNamespacedPersistentVolumeClaim('default');
+  try {
+    const {
+      body: { items },
+    } = await coreApi.listNamespacedPersistentVolumeClaim('default');
 
-  return pvcs.body.items
-    .filter(
-      (pvc) =>
-        pvc.metadata &&
-        pvc.metadata?.name?.startsWith(db) &&
-        pvc.metadata.labels &&
-        pvc.spec?.resources?.requests?.storage &&
-        parseInt(pvc.spec.resources.requests.storage.replace('Gi', ''), 10) >=
-          minimumAvailableStorage
-    )
-    .map((pvc) => ({
-      deploymentName: pvc.metadata!.labels!.deploymentName,
-      serviceName: pvc.metadata!.labels!.serviceName,
-    }));
+    writeFileSync('pvc.json', JSON.stringify(items, null, 2));
+
+    return items
+      .filter((pvc) => {
+        if (!pvc.metadata?.name?.startsWith(db)) return false;
+        if (!pvc.spec?.resources?.requests?.storage) return false;
+        const storageAvailable = Number(pvc.spec.resources.requests.storage.replace('Gi', ''));
+        console.log({
+          storageAvailable,
+          minimumAvailableStorage,
+        });
+        return storageAvailable >= minimumAvailableStorage;
+      })
+      .map((pvc) => ({
+        deploymentName: pvc.metadata!.labels!.deploymentName,
+        serviceName: pvc.metadata!.labels!.serviceName,
+      }));
+  } catch (error) {
+    return [];
+  }
 };

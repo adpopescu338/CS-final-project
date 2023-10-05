@@ -1,58 +1,48 @@
 import { DBMS } from '@prisma/client';
-import { filterServicesByAvailableStorage } from './filterServicesByAvailableStorage';
 import { client } from 'prisma/client';
-import { MAX_DATABASES_PER_POD } from 'libs/constants';
-import { getServicePublicIp } from './getServicePublicIp';
+import { MAX_DATABASES_PER_POD, MAX_SIZE_PER_DATABASE, POD_STORAGE_GIGA } from 'libs/constants';
 import { getServiceInternalAddress } from './getServiceInternalAddress';
+import { getDbManager } from 'libs/utils';
 
 export const getAvailableService = async (db: DBMS) => {
-  const services = await filterServicesByAvailableStorage(db, 1);
+  const pods = await client.pod.findMany({
+    where: {
+      deploymentName: {
+        startsWith: db,
+      },
+    },
+    include: {
+      _count: {
+        select: {
+          databases: true,
+        },
+      },
+    },
+  });
 
-  if (!services.length) {
+  if (!pods.length) {
     return null;
   }
 
-  for (const service of services) {
-    const pod = await client.pod.findUnique({
-      where: {
-        serviceName: service.serviceName,
-      },
-      include: {
-        _count: {
-          select: {
-            databases: true,
-          },
-        },
-      },
+  for (const pod of pods) {
+    if (pod._count?.databases >= MAX_DATABASES_PER_POD) {
+      continue;
+    }
+    const dbManager = getDbManager(db);
+    const usedSpaceInMegabytes = await dbManager.getWholeDbSize({
+      host: pod.internalAddress,
     });
-    if (!pod) {
+    const usedSpaceInGigabytes = usedSpaceInMegabytes / 1000;
+    const availableSpaceInGigabytes = POD_STORAGE_GIGA - usedSpaceInGigabytes;
+    if (availableSpaceInGigabytes < MAX_SIZE_PER_DATABASE) {
       continue;
     }
 
-    if (!pod.publicIp) {
-      const publicIp = await getServicePublicIp(service.serviceName);
-      if (publicIp) {
-        pod.publicIp = publicIp;
-        await client.pod.update({
-          where: {
-            id: pod.id,
-          },
-          data: {
-            publicIp,
-          },
-        });
-      } else {
-        continue;
-      }
-    }
-
-    if (!pod._count.databases || pod._count.databases < MAX_DATABASES_PER_POD) {
-      return {
-        deploymentName: service.deploymentName,
-        publicIpAddress: pod.publicIp,
-        internalAddress: getServiceInternalAddress(service.serviceName),
-      };
-    }
+    return {
+      deploymentName: pod.deploymentName,
+      publicIpAddress: pod.publicIp,
+      internalAddress: getServiceInternalAddress(pod.serviceName),
+    };
   }
 
   return null;

@@ -21,3 +21,5 @@ export type Result = {
     expiresAt: Date;
   };
 };
+
+export const path = 'refresh-token';

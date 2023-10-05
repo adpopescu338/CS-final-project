@@ -22,3 +22,5 @@ export const schema: yup.Schema<ReqPayload> = yup.object().shape({
 export type Result = {
   message: string;
 };
+
+export const path = '/newdb/:type';
