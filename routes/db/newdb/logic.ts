@@ -11,13 +11,13 @@ import { encrypt } from 'libs/utils';
 import { ReqPayload, Result } from './schemas';
 import { checkIfUserCanCreateDb, getPodDetails, revert } from './utils';
 import { getDbManager } from 'libs/utils/getDbManager';
+import { UserCreatedDetails } from 'databases/DBManager';
 
 const createDbAndUser = async (
   dbManager: typeof mongoManager | typeof mysqlManager | typeof postgresManager,
   dbType: DBMS,
   user: SessionUser,
-  body: ReqPayload['body'],
-  shouldCreateUser: boolean
+  body: ReqPayload['body']
 ) => {
   const { name, email, id } = user;
   const { databaseName } = body;
@@ -28,28 +28,27 @@ const createDbAndUser = async (
     database: `${name}_${databaseName}_${uuid().slice(0, 8)}`,
   };
 
-  const { pod, isNew } = await getPodDetails(dbType);
+  const { pod } = await getPodDetails(dbType);
 
   const internalConnectionDetails = {
     host: pod.internalAddress,
   };
 
-  const userConnectionDetails =
-    shouldCreateUser || isNew
-      ? await dbManager.createDbAndUser(newUser, internalConnectionDetails)
-      : await dbManager.createDbForExistingUser(newUser, internalConnectionDetails);
+  let userConnectionDetails: UserCreatedDetails;
+  try {
+    userConnectionDetails = await dbManager.createDbAndUser(newUser, internalConnectionDetails);
+    console.log('user created successfully', userConnectionDetails);
 
-  console.log('user created successfully', userConnectionDetails);
-
-  const success = await dbManager.checkUserCreation({
-    user: userConnectionDetails.username,
-    password: userConnectionDetails.password,
-    database: userConnectionDetails.database,
-    host: userConnectionDetails.host,
-  });
-
-  if (!success) {
-    console.log('user creation failed: unable to connect. Reverting');
+    const success = await dbManager.checkUserCreation({
+      user: userConnectionDetails.username,
+      password: userConnectionDetails.password,
+      database: userConnectionDetails.database,
+      host: userConnectionDetails.host,
+    });
+    if (!success) throw new Error('User creation failed');
+  } catch (error) {
+    console.log('user creation failed: ', error.message);
+    console.log('reverting changes');
     await revert(
       dbManager,
       newUser.username,
@@ -107,10 +106,10 @@ export const logic = async (req: AuthedRequest, res: Response) => {
   const { type } = req.params as ReqPayload['params'];
   const { user } = req;
 
-  const { shouldCreateUser } = await checkIfUserCanCreateDb(user.id);
+  await checkIfUserCanCreateDb(user.id, type);
   const dbManager = getDbManager(type);
 
-  await createDbAndUser(dbManager, type, user, req.body, shouldCreateUser);
+  await createDbAndUser(dbManager, type, user, req.body);
 
   const result: Result = {
     message: 'User created successfully. You will receive an email with your credentials shortly',

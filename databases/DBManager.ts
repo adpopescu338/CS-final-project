@@ -43,14 +43,6 @@ export interface DBManager<Client> {
   ): Promise<UserCreatedDetails>;
 
   /**
-   * @description Create a database for an existing user
-   */
-  createDbForExistingUser(
-    userDetails: UserDetails,
-    connectionDetails: InternalConnectionDetails
-  ): Promise<UserCreatedDetails>;
-
-  /**
    * @description Delete a user from the database
    * @param username the username of the user to delete
    */

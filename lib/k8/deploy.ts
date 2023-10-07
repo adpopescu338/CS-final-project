@@ -5,7 +5,7 @@ import { client } from 'prisma/client';
 import { waitFor } from 'libs/utils';
 import { getServiceInternalAddress } from './getServiceInternalAddress';
 
-const MAX_RETRIES = 20;
+const MAX_RETRIES = 200;
 const isPodReady = async (deploymentName: string, retries = 0) => {
   try {
     const {
@@ -78,7 +78,6 @@ export const deploy = async (db: DBMS) => {
     await waitFor(10000);
 
     const podIsReady = await isPodReady(deployment.metadata.name);
-    console.log('pod is ready', podIsReady);
     if (!podIsReady) {
       await revertDeployment(deployment.metadata.name, service.metadata.name, pvc.metadata.name);
       throw new Error('Pod is not ready');

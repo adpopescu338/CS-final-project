@@ -4,7 +4,7 @@ import { mongoManager, mysqlManager, postgresManager } from 'databases';
 import { DBMS } from 'libs/types';
 import { client } from 'prisma/client';
 import { BeError } from 'libs/BeError';
-import { ErrorCodes, MAX_DATABASES_ACC_SIZE, MAX_DATABASES_PER_USER } from 'libs/constants';
+import { ErrorCodes } from 'libs/constants';
 
 export const revert = async (
   dbManager: typeof mongoManager | typeof mysqlManager | typeof postgresManager,
@@ -25,7 +25,7 @@ export const getPodDetails = async (
   isNew: boolean;
 }> => {
   const availableService = await getAvailableService(dbType);
-
+  console.log('availableService', availableService);
   if (availableService) {
     const podDetails = await client.pod.findUnique({
       where: {
@@ -49,10 +49,11 @@ export const getPodDetails = async (
   };
 };
 
-export const checkIfUserCanCreateDb = async (userId: string) => {
+export const checkIfUserCanCreateDb = async (userId: string, type: DBMS) => {
   const databases = await client.database.findMany({
     where: {
       userId,
+      type,
     },
   });
 
@@ -62,18 +63,6 @@ export const checkIfUserCanCreateDb = async (userId: string) => {
       shouldCreateUser: true,
     };
   }
-  if (databases.length > MAX_DATABASES_PER_USER)
-    throw new BeError('You have reached the maximum number of databases', ErrorCodes.Forbidden);
 
-  const accumulatedSize = databases.reduce((acc, curr) => acc + curr.size, 0);
-
-  if (accumulatedSize >= MAX_DATABASES_ACC_SIZE)
-    throw new BeError(
-      `You have reached the maximum size of ${MAX_DATABASES_ACC_SIZE} MB`,
-      ErrorCodes.Forbidden
-    );
-
-  return {
-    shouldCreateUser: false,
-  };
+  throw new BeError(`You already have a ${type} database. `, ErrorCodes.Forbidden);
 };

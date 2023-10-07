@@ -5,7 +5,6 @@ import { deleteDatabase } from './deleteDatabase';
 import { Connection } from 'mysql2';
 import { DBManager, ConnectionDetails, UserDetails, InternalConnectionDetails } from '../DBManager';
 import { getWholeDbSize } from './getWholeDbSize';
-import { createDbForExistingUser } from './createDbForExistingUser';
 
 class MysqlManager implements DBManager<Connection> {
   connect(connectionDetails: ConnectionDetails | InternalConnectionDetails) {
@@ -15,14 +14,6 @@ class MysqlManager implements DBManager<Connection> {
   async createDbAndUser(userDetails: UserDetails, connectionDetails: InternalConnectionDetails) {
     const client = await this.connect(connectionDetails);
     return createDbAndUser(client, userDetails);
-  }
-
-  async createDbForExistingUser(
-    userDetails: UserDetails,
-    connectionDetails: InternalConnectionDetails
-  ) {
-    const client = await this.connect(connectionDetails);
-    return createDbForExistingUser(client, userDetails);
   }
 
   async deleteUser(username: string, connectionDetails: InternalConnectionDetails) {

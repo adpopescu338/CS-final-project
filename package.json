@@ -67,9 +67,6 @@
     "ext": ".ts",
     "exec": "ts-node -r tsconfig-paths/register index.ts"
   },
-  "prisma": {
-    "seed": "ts-node prisma/seed.ts"
-  },
   "eslintConfig": {
     "extends": [
       "react-app",

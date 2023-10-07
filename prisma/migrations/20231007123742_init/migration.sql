@@ -84,9 +84,6 @@ CREATE UNIQUE INDEX "Pod_pvcName_key" ON "Pod"("pvcName");
 -- CreateIndex
 CREATE UNIQUE INDEX "ScheduledEmail_databaseId_key" ON "ScheduledEmail"("databaseId");
 
--- CreateIndex
-CREATE UNIQUE INDEX "RefreshToken_userId_key" ON "RefreshToken"("userId");
-
 -- AddForeignKey
 ALTER TABLE "Database" ADD CONSTRAINT "Database_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 

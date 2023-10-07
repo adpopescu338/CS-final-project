@@ -37,7 +37,7 @@ const getDeployment = (db: DBMS, identifier: string) => {
           valueFrom: {
             secretKeyRef: {
               name: 'apps-secrets',
-              key: 'MONGO_INITDB_ROOT_USERNAME',
+              key: 'MONGO_USERNAME',
             },
           },
         },
@@ -46,7 +46,7 @@ const getDeployment = (db: DBMS, identifier: string) => {
           valueFrom: {
             secretKeyRef: {
               name: 'apps-secrets',
-              key: 'MONGO_INITDB_ROOT_PASSWORD',
+              key: 'MONGO_PASSWORD',
             },
           },
         },

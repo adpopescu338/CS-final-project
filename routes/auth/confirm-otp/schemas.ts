@@ -1,4 +1,3 @@
-import { SessionUser } from 'libs/types';
 import * as yup from 'yup';
 
 export type ReqPayload = {
@@ -15,10 +14,6 @@ export const schema: yup.Schema<ReqPayload> = yup.object().shape({
 
 export type Result = {
   message: string;
-  data: {
-    refreshToken: string;
-    user: SessionUser;
-  };
 };
 
 export const path = 'confirm-otp';

@@ -1,6 +1,6 @@
 import { DBMS } from '@prisma/client';
 import { client } from 'prisma/client';
-import { MAX_DATABASES_PER_POD, MAX_SIZE_PER_DATABASE, POD_STORAGE_GIGA } from 'libs/constants';
+import { MAX_DATABASES_PER_POD, MAX_GIGA_SIZE_PER_DATABASE, POD_STORAGE_GIGA } from 'libs/constants';
 import { getServiceInternalAddress } from './getServiceInternalAddress';
 import { getDbManager } from 'libs/utils';
 
@@ -21,11 +21,13 @@ export const getAvailableService = async (db: DBMS) => {
   });
 
   if (!pods.length) {
+    console.log('no pods found');
     return null;
   }
 
   for (const pod of pods) {
     if (pod._count?.databases >= MAX_DATABASES_PER_POD) {
+      console.log('max databases per pod reached');
       continue;
     }
     const dbManager = getDbManager(db);
@@ -34,7 +36,7 @@ export const getAvailableService = async (db: DBMS) => {
     });
     const usedSpaceInGigabytes = usedSpaceInMegabytes / 1000;
     const availableSpaceInGigabytes = POD_STORAGE_GIGA - usedSpaceInGigabytes;
-    if (availableSpaceInGigabytes < MAX_SIZE_PER_DATABASE) {
+    if (availableSpaceInGigabytes < MAX_GIGA_SIZE_PER_DATABASE) {
       continue;
     }
 

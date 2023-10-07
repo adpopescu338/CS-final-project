@@ -24,14 +24,12 @@ export const connect = (
     console.log('Connection already exists!');
     return connectionsMap.get(connectionKey);
   }
-  console.log(`Creating new connection to postgres for user ${connectionDetails.user}!`);
+  console.log(
+    `Creating new connection to postgres for user ${connectionDetails.user}!`,
+    connectionDetails
+  );
 
-  const connection = mysql.createConnection({
-    host: connectionDetails.host,
-    user: connectionDetails.user,
-    password: connectionDetails.password,
-    port: connectionDetails.port,
-  });
+  const connection = mysql.createConnection(connectionDetails);
 
   connection.on('end', () => {
     console.log('Connection ended!');
