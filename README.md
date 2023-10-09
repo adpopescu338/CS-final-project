@@ -29,3 +29,11 @@ app.get('/', validate(schemaValidator), (req, res) => {
  ...
 });
 ```
+
+## Adminer
+
+Adminer is a database management tool that allows you to manage your databases from a web interface.
+It supports multiple databases.
+We need to start a PHP server for it to work, on a different port than the one we use for the API.
+We use a proxy to redirect the requests to /admin\* to the PHP server.
+In development it doesn't work properly. To test, run `yarn build` and then `yarn start` and go to `localhost:3000/admin`.
