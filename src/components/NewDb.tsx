@@ -1,24 +1,30 @@
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Alert, Box, CircularProgress } from '@mui/material';
+import { TextField, Button, Typography, Box, CircularProgress } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
-import { DBMS } from '@prisma/client';
+import type { DBMS } from '@prisma/client';
 import { req } from 'src/lib/Req';
+import swal from 'sweetalert';
 
 export const NewDb = () => {
-  const [dbType, setDbType] = useState<DBMS | null>(null);
+  const [dbType, setDbType] = useState<DBMS>('mysql');
   const [databaseName, setDatabaseName] = useState('');
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false); // New state for loading
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
     try {
-      const response = await req.createNewDb({ databaseName }, { type: dbType as DBMS });
-      setMessage(response.message);
+      const response = await req.createNewDb({ databaseName }, { type: dbType });
+
+      swal({
+        title: 'Database created',
+        text: response.message,
+      });
     } catch (err) {
-      setError(err.message);
+      swal({
+        title: 'Something went wrong',
+        text: err.message,
+      });
     } finally {
       setLoading(false);
     }
@@ -27,9 +33,10 @@ export const NewDb = () => {
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
       <Autocomplete
-        options={Object.values(DBMS)}
+        disableClearable
+        options={['mysql', 'mongodb', 'postgresql']}
         value={dbType}
-        onChange={(event, newValue) => setDbType(newValue)}
+        onChange={(event, newValue) => newValue && setDbType(newValue as DBMS)}
         renderInput={(params) => (
           <TextField {...params} label="Choose DBMS" required variant="outlined" fullWidth />
         )}
@@ -58,8 +65,6 @@ export const NewDb = () => {
       >
         Create Database
       </Button>
-      {error && <Alert severity="error">{error}</Alert>}
-      {message && <Alert severity="success">{message}</Alert>}
     </Box>
   );
 };

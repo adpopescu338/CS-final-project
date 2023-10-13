@@ -6,11 +6,10 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import Alert from '@mui/material/Alert';
+import swal from 'sweetalert';
 
 export const Signup = () => {
   const navigate = useNavigate();
-  const [error, setError] = React.useState(null);
   const [step, setStep] = React.useState(0);
   const [values, setValues] = React.useState({
     email: '',
@@ -37,7 +36,7 @@ export const Signup = () => {
       await req.signup(values);
       setStep(1);
     } catch (err) {
-      setError(err.message);
+      swal(err.message);
     }
   };
 
@@ -53,7 +52,7 @@ export const Signup = () => {
         navigate('/dashboard');
       }, 2000);
     } catch (err) {
-      setError(err.message);
+      swal(err.message);
     }
   };
 
@@ -94,7 +93,6 @@ export const Signup = () => {
 
   return (
     <Container component="main" maxWidth="xs">
-      {error && <Alert severity="error">{error}</Alert>}
       {steps[step]}
     </Container>
   );

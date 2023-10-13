@@ -7,11 +7,10 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
-import Alert from '@mui/material/Alert';
+import swal from 'sweetalert';
 
 export const Signin = () => {
   const navigate = useNavigate();
-  const [error, setError] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
   const [values, setValues] = React.useState({
     email: '',
@@ -25,7 +24,7 @@ export const Signin = () => {
       await req.signin(values);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message);
+      swal(err.message);
     } finally {
       setLoading(false);
     }
@@ -42,7 +41,6 @@ export const Signin = () => {
       <Typography component="h1" variant="h5">
         Sign in
       </Typography>
-      {error && <Alert severity="error">{error}</Alert>}
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
         <TextField
           variant="outlined"

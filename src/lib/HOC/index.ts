@@ -1,0 +1,1 @@
+export { authedPage } from './authedPage';

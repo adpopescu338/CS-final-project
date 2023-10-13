@@ -1,8 +1,9 @@
 import React from 'react';
 import { Container, Typography, Box, Divider } from '@mui/material';
 import { NewDb } from 'src/components/NewDb';
+import { authedPage } from 'src/lib/HOC';
 
-export const Dashboard = () => {
+export const Dashboard = authedPage(() => {
   return (
     <Container>
       <Box mt={4} mb={2}>
@@ -19,4 +20,4 @@ export const Dashboard = () => {
       </Box>
     </Container>
   );
-};
+});

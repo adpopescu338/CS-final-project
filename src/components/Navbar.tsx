@@ -45,13 +45,15 @@ export const Navbar = () => {
                     </Button>
                   </Link>
                 </Grid>
-                <Grid item>
-                  <Link to="/dashboard">
-                    <Button color="secondary" variant="contained" size={buttonSize}>
-                      Dashboard
-                    </Button>
-                  </Link>
-                </Grid>
+                {session.user && (
+                  <Grid item>
+                    <Link to="/dashboard">
+                      <Button color="secondary" variant="contained" size={buttonSize}>
+                        Dashboard
+                      </Button>
+                    </Link>
+                  </Grid>
+                )}
               </Grid>
             </Grid>
 

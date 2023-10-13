@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { Grid, Typography } from '@mui/material';
+import { authedPage } from 'src/lib/HOC';
 
-export const Settings = () => {
+export const Settings = authedPage(() => {
   return (
     <Grid container spacing={2} direction="column">
       <Grid item>
@@ -12,4 +13,4 @@ export const Settings = () => {
       </Grid>
     </Grid>
   );
-};
+});
