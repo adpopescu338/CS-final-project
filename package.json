@@ -12,7 +12,8 @@
     "build:be": "tsc",
     "build": "tsc && yarn build:fe",
     "start": "nodemon .dist/index.js",
-    "postinstall": "node prisma/prepare.mjs"
+    "postinstall": "node prisma/prepare.mjs",
+    "start-db": "ts-node -r tsconfig-paths/register scripts/start-db.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -23,6 +24,7 @@
     "@react-email/html": "^0.0.4",
     "@react-email/render": "^0.0.7",
     "@sendgrid/mail": "^7.7.0",
+    "@tanstack/react-query": "^4.36.1",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.40",
     "@types/react": "^18.2.20",

@@ -1,2 +1,2 @@
 export { Navbar } from './Navbar';
-export { NewDb } from './NewDb';
+export { NewDb } from './Databases/NewDb';

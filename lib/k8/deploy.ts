@@ -1,6 +1,6 @@
 import { DBMS } from 'libs/types';
 import { getDeploymentData } from './getDeploymentData';
-import { appsV1Api, coreApi } from './k8';
+import { appsV1Api, coreApi, networkingApi } from './k8';
 import { client } from 'prisma/client';
 import { waitFor } from 'libs/utils';
 import { getServiceInternalAddress } from './getServiceInternalAddress';
@@ -56,10 +56,10 @@ const revertDeployment = async (deploymentName: string, serviceName: string, pvc
  * Deploy a new database instance to the cluster
  * @returns The ID of the newly created pod entry in the database
  */
-export const deploy = async (db: DBMS) => {
+export const deploy = async (db: DBMS, identifier?: string) => {
   console.log('deploying new pod for ', db);
-  const identifier = Date.now().toString();
-  const { deployment, service, pvc } = getDeploymentData(db, identifier);
+  identifier ??= Date.now().toString();
+  const { deployment, service, pvc, ingressControllerRule } = getDeploymentData(db, identifier);
 
   const name = `${db}-${identifier}`;
   try {
@@ -75,12 +75,35 @@ export const deploy = async (db: DBMS) => {
     await coreApi.createNamespacedService('default', service);
     console.log(`Service for ${name} created`);
     console.log('waiting for pod to be ready');
-    await waitFor(10000);
+    await waitFor(5000);
 
     const podIsReady = await isPodReady(deployment.metadata.name);
     if (!podIsReady) {
       await revertDeployment(deployment.metadata.name, service.metadata.name, pvc.metadata.name);
       throw new Error('Pod is not ready');
+    }
+
+    console.log('ingressControllerRule  ===== ', JSON.stringify(ingressControllerRule, null, 2));
+    // Patch Ingress Controller
+    await networkingApi.patchNamespacedIngress(
+      'nginx-ingress-controller',
+      'default',
+      [ingressControllerRule],
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      {
+        headers: {
+          'Content-Type': 'application/json-patch+json',
+        },
+      }
+    );
+
+    if (process.env.LOCAL === 'true') {
+      console.log(`Deployed`);
+      return;
     }
 
     const deplymentDetails = await client.pod.create({

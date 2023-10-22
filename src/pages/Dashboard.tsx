@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Typography, Box, Divider } from '@mui/material';
-import { NewDb } from 'src/components/NewDb';
+import { NewDb } from 'src/components/Databases/NewDb';
 import { authedPage } from 'src/lib/HOC';
 
 export const Dashboard = authedPage(() => {

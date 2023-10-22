@@ -3,6 +3,7 @@ import * as Signin from 'routes/auth/signin/schemas';
 import * as Me from 'routes/auth/me/schemas';
 import * as Signup from 'routes/auth/signup/schemas';
 import * as NewDb from 'routes/db/newdb/schemas';
+import * as Databases from 'routes/db/databases/schemas';
 
 class Requestor {
   private refreshToken = '';
@@ -27,6 +28,10 @@ class Requestor {
     this.refreshToken = res.data.refreshToken;
 
     window.location.href = '/dashboard';
+  }
+
+  getDatabases() {
+    return this.get<Databases.Result>('/api/databases');
   }
 
   async me() {

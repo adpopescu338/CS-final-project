@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-ingress-controller
+  namespace: default
+  labels:
+    app: nginx-ingress-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-ingress-controller
+  template:
+    metadata:
+      labels:
+        app: nginx-ingress-controller
+    spec:
+      containers:
+      - name: nginx-ingress-controller
+        image: nginx/nginx-ingress:3.3.0  # updated to the latest stable version as per the provided content
+        ports:
+        - name: postgres
+          containerPort: 5432
+        - name: mongodb
+          containerPort: 27017
+        - name: mysql
+          containerPort: 3306

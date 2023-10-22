@@ -14,6 +14,9 @@ const getPort = (db: DBMS) => {
   }
 };
 
+const getDbIdentifier = (db: DBMS, identifier?: string, subDomain = false) =>
+  `${db}${subDomain ? '_' : '-'}${identifier}`;
+
 const getDockerImageName = (db: DBMS) => {
   switch (db) {
     case DBMS.mongodb:
@@ -86,30 +89,30 @@ const getDeployment = (db: DBMS, identifier: string) => {
     apiVersion: 'apps/v1',
     kind: 'Deployment',
     metadata: {
-      name: `${db}-deployment-${identifier}`,
+      name: `${getDbIdentifier(db, identifier)}-deployment`,
       labels: {
-        serviceName: `${db}-${identifier}-service`,
-        pvcName: `${db}-${identifier}-pvc`,
-        deploymentName: `${db}-deployment-${identifier}`,
+        serviceName: `${getDbIdentifier(db, identifier)}-service`,
+        pvcName: `${getDbIdentifier(db, identifier)}-pvc`,
+        deploymentName: `${getDbIdentifier(db, identifier)}-deployment`,
       },
     },
     spec: {
       replicas: 1,
       selector: {
         matchLabels: {
-          app: `${db}-${identifier}`,
+          app: getDbIdentifier(db, identifier),
         },
       },
       template: {
         metadata: {
           labels: {
-            app: `${db}-${identifier}`,
+            app: getDbIdentifier(db, identifier),
           },
         },
         spec: {
           containers: [
             {
-              name: `${db}-${identifier}`,
+              name: getDbIdentifier(db, identifier),
               image: `${getDockerImageName(db)}:latest`,
               ports: [
                 {
@@ -119,17 +122,17 @@ const getDeployment = (db: DBMS, identifier: string) => {
               env: envs,
               volumeMounts: [
                 {
-                  name: `${db}-${identifier}-persistent-storage`,
-                  mountPath: `/data/db/${db}-${identifier}`,
+                  name: `${getDbIdentifier(db, identifier)}-persistent-storage`,
+                  mountPath: `/data/db/${getDbIdentifier(db, identifier)}`,
                 },
               ],
             },
           ],
           volumes: [
             {
-              name: `${db}-${identifier}-persistent-storage`,
+              name: `${getDbIdentifier(db, identifier)}-persistent-storage`,
               persistentVolumeClaim: {
-                claimName: `${db}-${identifier}-pvc`,
+                claimName: `${getDbIdentifier(db, identifier)}-pvc`,
               },
             },
           ],
@@ -143,15 +146,15 @@ const getService = (db: DBMS, identifier: string) => ({
   apiVersion: 'v1',
   kind: 'Service',
   metadata: {
-    name: `${db}-${identifier}-service`,
+    name: `${getDbIdentifier(db, identifier)}-service`,
     labels: {
-      deploymentName: `${db}-deployment-${identifier}`,
-      pvcName: `${db}-${identifier}-pvc`,
-      serviceName: `${db}-${identifier}-service`,
+      deploymentName: `${getDbIdentifier(db, identifier)}-deployment`,
+      pvcName: `${getDbIdentifier(db, identifier)}-pvc`,
+      serviceName: `${getDbIdentifier(db, identifier)}-service`,
     },
   },
   spec: {
-    type: 'LoadBalancer',
+    type: 'NodePort', //process.env.LOCAL ? 'LoadBalancer' : 'NodePort',
     ports: [
       {
         port: getPort(db),
@@ -159,7 +162,7 @@ const getService = (db: DBMS, identifier: string) => ({
       },
     ],
     selector: {
-      app: `${db}-${identifier}`,
+      app: getDbIdentifier(db, identifier),
     },
   },
 });
@@ -168,11 +171,11 @@ const getPvc = (db: DBMS, identifier: string, storage = `${POD_STORAGE_GIGA}Gi`)
   apiVersion: 'v1',
   kind: 'PersistentVolumeClaim',
   metadata: {
-    name: `${db}-${identifier}-pvc`,
+    name: `${getDbIdentifier(db, identifier)}-pvc`,
     labels: {
-      deploymentName: `${db}-deployment-${identifier}`,
-      serviceName: `${db}-${identifier}-service`,
-      pvcName: `${db}-${identifier}-pvc`,
+      deploymentName: `${getDbIdentifier(db, identifier)}-deployment`,
+      serviceName: `${getDbIdentifier(db, identifier)}-service`,
+      pvcName: `${getDbIdentifier(db, identifier)}-pvc`,
     },
   },
   spec: {
@@ -186,12 +189,41 @@ const getPvc = (db: DBMS, identifier: string, storage = `${POD_STORAGE_GIGA}Gi`)
 });
 
 /**
+ * Returns the payload for the patch request to add a new ingress rule (subdomain for the new database)
+ */
+const getIngressControllerPatch = (db: DBMS, identifier: string, serviceName: string) => ({
+  op: 'add',
+  path: '/spec/rules/-',
+  value: {
+    host: `${getDbIdentifier(db, identifier)}.localhost`,
+    http: {
+      paths: [
+        {
+          path: '/',
+          pathType: 'Prefix',
+          backend: {
+            service: {
+              name: serviceName,
+              port: {
+                number: getPort(db),
+              },
+            },
+          },
+        },
+      ],
+    },
+  },
+});
+
+/**
  * Get all the data needed to deploy a new database instance
  */
 export const getDeploymentData = (db: DBMS, identifier: string) => {
+  const service = getService(db, identifier);
   return {
     deployment: getDeployment(db, identifier),
-    service: getService(db, identifier),
+    service,
     pvc: getPvc(db, identifier),
+    ingressControllerRule: getIngressControllerPatch(db, identifier, service.metadata.name),
   };
 };
