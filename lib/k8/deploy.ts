@@ -1,6 +1,6 @@
 import { DBMS } from 'libs/types';
 import { getDeploymentData } from './getDeploymentData';
-import { appsV1Api, coreApi, networkingApi } from './k8';
+import { appsV1Api, coreApi, customObjectsApi } from './k8';
 import { client } from 'prisma/client';
 import { waitFor } from 'libs/utils';
 import { getServiceInternalAddress } from './getServiceInternalAddress';
@@ -59,7 +59,7 @@ const revertDeployment = async (deploymentName: string, serviceName: string, pvc
 export const deploy = async (db: DBMS, identifier?: string) => {
   console.log('deploying new pod for ', db);
   identifier ??= Date.now().toString();
-  const { deployment, service, pvc, ingressControllerRule } = getDeploymentData(db, identifier);
+  const { deployment, service, pvc, transportServer } = getDeploymentData(db, identifier);
 
   const name = `${db}-${identifier}`;
   try {
@@ -83,22 +83,14 @@ export const deploy = async (db: DBMS, identifier?: string) => {
       throw new Error('Pod is not ready');
     }
 
-    console.log('ingressControllerRule  ===== ', JSON.stringify(ingressControllerRule, null, 2));
+    console.log('ingressControllerRule  ===== ', JSON.stringify(transportServer, null, 2));
     // Patch Ingress Controller
-    await networkingApi.patchNamespacedIngress(
-      'nginx-ingress-controller',
+    await customObjectsApi.createNamespacedCustomObject(
+      'networking.k8s.io',
+      'v1',
       'default',
-      [ingressControllerRule],
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      {
-        headers: {
-          'Content-Type': 'application/json-patch+json',
-        },
-      }
+      'ingresses',
+      transportServer
     );
 
     if (process.env.LOCAL === 'true') {

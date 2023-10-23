@@ -3,4 +3,9 @@ kind: Ingress
 metadata:
   name: nginx-ingress-controller
   namespace: default
-spec: {}
+spec:
+  defaultBackend:
+    service:
+      name: cs-express-service # Name of a default service to route traffic to
+      port:
+        number: 80 # Port number of the default service

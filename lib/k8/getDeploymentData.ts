@@ -191,26 +191,28 @@ const getPvc = (db: DBMS, identifier: string, storage = `${POD_STORAGE_GIGA}Gi`)
 /**
  * Returns the payload for the patch request to add a new ingress rule (subdomain for the new database)
  */
-const getIngressControllerPatch = (db: DBMS, identifier: string, serviceName: string) => ({
-  op: 'add',
-  path: '/spec/rules/-',
-  value: {
-    host: `${getDbIdentifier(db, identifier)}.localhost`,
-    http: {
-      paths: [
-        {
-          path: '/',
-          pathType: 'Prefix',
-          backend: {
-            service: {
-              name: serviceName,
-              port: {
-                number: getPort(db),
-              },
-            },
-          },
-        },
-      ],
+const getTransportServer = (db: DBMS, identifier: string) => ({
+  apiVersion: 'k8s.nginx.org/v1alpha1',
+  kind: 'TransportServer',
+  metadata: {
+    name: `${getDbIdentifier(db, identifier)}-transport`,
+    namespace: 'default', // Adjust if you're using a different namespace
+  },
+  spec: {
+    listener: {
+      name: `${getDbIdentifier(db, identifier)}-service`,
+      protocol: 'TCP',
+    },
+    host: `${getDbIdentifier(db, identifier, true)}.localhost`,
+    upstreams: [
+      {
+        name: `${getDbIdentifier(db, identifier)}-transport-upstream`,
+        service: `${getDbIdentifier(db, identifier)}-service`,
+        port: getPort(db),
+      },
+    ],
+    action: {
+      pass: `${getDbIdentifier(db, identifier)}-service`,
     },
   },
 });
@@ -220,10 +222,14 @@ const getIngressControllerPatch = (db: DBMS, identifier: string, serviceName: st
  */
 export const getDeploymentData = (db: DBMS, identifier: string) => {
   const service = getService(db, identifier);
+  const deployment = getDeployment(db, identifier);
+  const pvc = getPvc(db, identifier);
+  const transportServer = getTransportServer(db, identifier);
+
   return {
-    deployment: getDeployment(db, identifier),
+    deployment,
     service,
-    pvc: getPvc(db, identifier),
-    ingressControllerRule: getIngressControllerPatch(db, identifier, service.metadata.name),
+    pvc,
+    transportServer,
   };
 };

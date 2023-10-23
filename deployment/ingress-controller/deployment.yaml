@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: nginx-ingress-controller
-        image: nginx/nginx-ingress:3.3.0  # updated to the latest stable version as per the provided content
+        image: nginx/nginx-ingress:3.3.0
         ports:
         - name: postgres
           containerPort: 5432
