@@ -10,6 +10,7 @@ import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { req } from 'src/lib/Req';
+import { useMutation } from 'react-query';
 
 export const Navbar = () => {
   const session = useSession();
@@ -26,6 +27,8 @@ export const Navbar = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const logout = useMutation(req.logout);
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -77,9 +80,9 @@ export const Navbar = () => {
                       Settings
                     </MenuItem>
                     <MenuItem
-                      onClick={async (e) => {
-                        handleClose();
-                        await req.logout();
+                      onClick={() => {
+                        navigate('/');
+                        logout.mutate();
                       }}
                     >
                       Logout

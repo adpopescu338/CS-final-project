@@ -12,7 +12,8 @@
     "build:be": "tsc",
     "build": "tsc && yarn build:fe",
     "start": "nodemon .dist/index.js",
-    "postinstall": "node prisma/prepare.mjs"
+    "postinstall": "node prisma/prepare.mjs",
+    "start-db": "ts-node -r tsconfig-paths/register scripts/start-db.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -43,6 +44,7 @@
     "react": "^18.2.0",
     "react-app-rewired": "^2.2.1",
     "react-dom": "^18.2.0",
+    "react-query": "^3.39.3",
     "react-router-dom": "^6.16.0",
     "react-scripts": "5.0.1",
     "sweetalert": "^2.1.2",

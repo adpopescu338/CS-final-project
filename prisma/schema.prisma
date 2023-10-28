@@ -36,8 +36,16 @@ model Database {
   encryptedPassword      String
   encryptedConnectionUrl String
   encryptedUsername      String
+  status                 DatabaseStatus  @default(Deploying)
 
   @@unique([name, podId])
+}
+
+enum DatabaseStatus {
+  Deploying
+  Active
+  Stopped
+  Deleted
 }
 
 model Pod {

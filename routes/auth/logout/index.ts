@@ -1,4 +1,4 @@
 export { logic } from './logic';
-export { path } from './schemas';
 
+export const path = 'logout';
 export const method = 'post';

@@ -4,6 +4,7 @@ import { appsV1Api, coreApi } from './k8';
 import { client } from 'prisma/client';
 import { waitFor } from 'libs/utils';
 import { getServiceInternalAddress } from './getServiceInternalAddress';
+import { Pod } from '@prisma/client';
 
 const MAX_RETRIES = 200;
 const isPodReady = async (deploymentName: string, retries = 0) => {
@@ -51,12 +52,13 @@ const revertDeployment = async (deploymentName: string, serviceName: string, pvc
     console.error('Error reverting deployment', error);
   }
 };
-
 /**
  * Deploy a new database instance to the cluster
  * @returns The ID of the newly created pod entry in the database
  */
-export const deploy = async (db: DBMS) => {
+export async function deploy(db: DBMS, saveToDb?: true): Promise<Pod>;
+export async function deploy(db: DBMS, saveToDb: false): Promise<undefined>;
+export async function deploy(db: DBMS, saveToDb = true) {
   console.log('deploying new pod for ', db);
   const identifier = Date.now().toString();
   const { deployment, service, pvc } = getDeploymentData(db, identifier);
@@ -83,6 +85,10 @@ export const deploy = async (db: DBMS) => {
       throw new Error('Pod is not ready');
     }
 
+    if (!saveToDb) {
+      return;
+    }
+
     const deplymentDetails = await client.pod.create({
       data: {
         deploymentName: deployment.metadata.name,
@@ -99,4 +105,4 @@ export const deploy = async (db: DBMS) => {
     console.error('Error deploying resources:', error);
     throw error;
   }
-};
+}

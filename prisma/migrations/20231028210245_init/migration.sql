@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "DatabaseStatus" AS ENUM ('Deploying', 'Active', 'Stopped', 'Deleted');
+
+-- CreateEnum
 CREATE TYPE "DBMS" AS ENUM ('mongodb', 'mysql', 'postgresql');
 
 -- CreateTable
@@ -26,6 +29,7 @@ CREATE TABLE "Database" (
     "encryptedPassword" TEXT NOT NULL,
     "encryptedConnectionUrl" TEXT NOT NULL,
     "encryptedUsername" TEXT NOT NULL,
+    "status" "DatabaseStatus" NOT NULL DEFAULT 'Deploying',
 
     CONSTRAINT "Database_pkey" PRIMARY KEY ("id")
 );

@@ -3,6 +3,7 @@ import * as Signin from 'routes/auth/signin/schemas';
 import * as Me from 'routes/auth/me/schemas';
 import * as Signup from 'routes/auth/signup/schemas';
 import * as NewDb from 'routes/db/newdb/schemas';
+import * as Databases from 'routes/db/databases/schemas';
 
 class Requestor {
   private refreshToken = '';
@@ -29,14 +30,18 @@ class Requestor {
     window.location.href = '/dashboard';
   }
 
+  getDatabases = () => {
+    return this.get<Databases.Result>('/api/databases').then((d) => d.data);
+  };
+
   async me() {
     return this.get<Me.Result>('/api/me');
   }
 
-  async logout() {
-    await this.get('/api/logout');
+  logout = async () => {
+    await this.post('/api/logout');
     window.location.reload();
-  }
+  };
 
   createNewDb(body: NewDb.ReqPayload['body'], { type }: NewDb.ReqPayload['params']) {
     return this.post<NewDb.Result>(`/api/newdb/${type}`, body);
