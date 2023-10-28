@@ -16,8 +16,6 @@ kubectl create secret generic apps-secrets \
 --from-literal=MYSQL_PASSWORD=${MYSQL_PASSWORD} \
 --from-literal=POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
-kubectl apply -f https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/main/deploy/crds.yaml
-
 kubectl apply -f deployment/ingress-controller
 kubectl apply -f deployment/permissions
 
