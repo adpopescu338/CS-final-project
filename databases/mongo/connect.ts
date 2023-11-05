@@ -23,7 +23,7 @@ export const connect = async (
     console.log('Using cached connection');
     return connectionsMap.get(key);
   }
-  console.log(`Creating new connection to postgres for user ${connectionDetails.user}!`);
+  console.log(`Creating new connection to mongo for user ${connectionDetails.user}!`);
   const auth = `${connectionDetails.user}:${connectionDetails.password}@`;
   const dbName = connectionDetails.database || '';
   const connectionString = `mongodb://${auth}${connectionDetails.host}:${connectionDetails.port}/${dbName}`;

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ClientSession } from 'src/types/ClientSession';
-import { req } from 'src/lib/Req';
+import { req } from 'src/fe-lib/Req';
 
 const defaultSessionValue: ClientSession = {
   user: null,

@@ -2,12 +2,11 @@ import { EndpointDetails } from 'libs/types';
 import { asyncHandler, validate } from 'libs/middleware';
 import { auth } from 'libs/middleware';
 import { Schema } from 'yup';
-import { method } from 'routes/db/newdb';
 
 type EndpointArgs = [string, ...(typeof auth | Schema | typeof asyncHandler)[]];
 
 export const buildEndpoint = (details: EndpointDetails): EndpointArgs => {
-  const { path, logic, schema, withAuth } = details;
+  const { path, logic, schema, withAuth, method } = details;
 
   const endpoint: EndpointArgs = [path.startsWith('/') ? path : `/${path}`];
 

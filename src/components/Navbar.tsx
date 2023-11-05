@@ -9,7 +9,7 @@ import Grid from '@mui/material/Grid';
 import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { req } from 'src/lib/Req';
+import { req } from 'src/fe-lib/Req';
 import { useMutation } from 'react-query';
 
 export const Navbar = () => {

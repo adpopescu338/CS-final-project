@@ -1,5 +1,5 @@
 import { getAvailableService, deploy } from 'libs/k8';
-import { Pod } from '@prisma/client';
+import { DatabaseStatus, Pod } from '@prisma/client';
 import { mongoManager, mysqlManager, postgresManager } from 'databases';
 import { DBMS } from 'libs/types';
 import { client } from 'prisma/client';
@@ -54,6 +54,9 @@ export const checkIfUserCanCreateDb = async (userId: string, type: DBMS) => {
     where: {
       userId,
       type,
+      status: {
+        not: DatabaseStatus.Deleted,
+      },
     },
   });
 

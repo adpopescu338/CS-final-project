@@ -4,6 +4,7 @@ import * as Me from 'routes/auth/me/schemas';
 import * as Signup from 'routes/auth/signup/schemas';
 import * as NewDb from 'routes/db/newdb/schemas';
 import * as Databases from 'routes/db/databases/schemas';
+import * as DeleteDb from 'routes/db/delete/schemas';
 
 class Requestor {
   private refreshToken = '';
@@ -47,6 +48,10 @@ class Requestor {
     return this.post<NewDb.Result>(`/api/newdb/${type}`, body);
   }
 
+  deleteDb = (id: string) => {
+    return this.delete<DeleteDb.Result>(`/api/databases/${id}`);
+  };
+
   private async refreshAccessToken() {
     const res = await axios.post<Signin.Result>('/api/refresh-token', {
       refreshToken: this.refreshToken,
@@ -65,6 +70,25 @@ class Requestor {
         return res.data;
       }
       console.error(`An error occurred while making a GET request to ${args[0]}`, e);
+      if (e.response?.data?.message) {
+        // overwrite the error message, to display the one from the server
+        e['message'] = e.response.data.message;
+      }
+      throw e;
+    }
+  }
+
+  private async delete<T>(...args: Parameters<typeof axios.delete>): Promise<T> {
+    try {
+      const res = await axios.delete(...args);
+      return res.data;
+    } catch (e) {
+      if (e.response?.status === 401) {
+        await this.refreshAccessToken();
+        const res = await axios.delete(...args);
+        return res.data;
+      }
+      console.error(`An error occurred while making a DELETE request to ${args[0]}`, e);
       if (e.response?.data?.message) {
         // overwrite the error message, to display the one from the server
         e['message'] = e.response.data.message;

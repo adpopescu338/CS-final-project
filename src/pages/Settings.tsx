@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Grid, Typography } from '@mui/material';
-import { authedPage } from 'src/lib/HOC';
+import { authedPage } from 'src/fe-lib/HOC';
 
 export const Settings = authedPage(() => {
   return (

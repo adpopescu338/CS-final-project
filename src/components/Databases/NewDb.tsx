@@ -2,19 +2,23 @@ import React, { useState } from 'react';
 import { TextField, Button, Typography, Box, CircularProgress } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import type { DBMS } from '@prisma/client';
-import { req } from 'src/lib/Req';
+import { req } from 'src/fe-lib/Req';
 import swal from 'sweetalert';
+import { useQueryClient } from 'react-query';
+import { queryKeys } from 'src/fe-lib/constants';
 
 export const NewDb = () => {
   const [dbType, setDbType] = useState<DBMS>('mysql');
   const [databaseName, setDatabaseName] = useState('');
   const [loading, setLoading] = useState(false); // New state for loading
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
     try {
       const response = await req.createNewDb({ databaseName }, { type: dbType });
+      queryClient.invalidateQueries(queryKeys.databases);
 
       swal({
         title: 'Database created',

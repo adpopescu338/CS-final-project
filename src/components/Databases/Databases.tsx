@@ -1,9 +1,12 @@
 import React, { useEffect } from 'react';
-import { req } from 'src/lib/Req';
+import { req } from 'src/fe-lib/Req';
 import swal from 'sweetalert';
-import { useQuery } from 'react-query';
-import { queryKeys } from 'src/lib/constants';
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { queryKeys } from 'src/fe-lib/constants';
+import { Box, Button, CircularProgress, Grid, Typography } from '@mui/material';
+import styled from '@emotion/styled';
+import LinearProgress from '@mui/material/LinearProgress';
+import { MAX_GIGA_SIZE_PER_DATABASE } from '../../fe-lib/constants';
 
 type IDatabase = Awaited<ReturnType<typeof req.getDatabases>>[number];
 
@@ -32,21 +35,118 @@ const DatabasesList: React.FC<{
   if (loading) {
     return <CircularProgress />;
   }
-  console.log({ databases });
+
   if (!databases.length) {
     return <Box>You have no databases</Box>;
   }
 
-  return databases.map((db) => <Database key={db.id} db={db} />);
+  return (
+    <Grid container direction="column" gap={2} paddingBottom={10}>
+      {databases.map((db) => (
+        <Database key={db.id} db={db} />
+      ))}
+    </Grid>
+  );
 };
+
+const DbBox = styled(Box)`
+  background-color: white;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  .db-item-actions-container {
+    height: 0;
+    transition: height 0.3s ease-in-out;
+    overflow: hidden;
+  }
+  &:hover {
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+    transform: scale(1.03);
+    .db-item-actions-container {
+      height: 40px;
+    }
+  }
+`;
 
 const Database: React.FC<{
   db: IDatabase;
 }> = ({ db }) => {
+  const { mutate, isLoading } = useMutation(req.deleteDb);
+  const queryClient = useQueryClient();
+
+  const handleDelete = async (dbId: string) => {
+    const confirm = await swal({
+      title: 'Are you sure?',
+      text: 'This action is irreversible',
+      icon: 'warning',
+      dangerMode: true,
+      buttons: ['Cancel', 'Delete'],
+    });
+
+    if (!confirm) return;
+    mutate(dbId, {
+      onSuccess: () => {
+        swal('Database deleted');
+        queryClient.invalidateQueries(queryKeys.databases);
+      },
+      onError: (err: any) => {
+        swal('Something went wrong', err.message, 'error');
+      },
+    });
+  };
+
   return (
-    <Box>
-      <Typography variant="h6">{db.name}</Typography>
-      <Typography variant="body2"> {db.type}</Typography>
-    </Box>
+    <Grid item>
+      <DbBox>
+        <Grid container justifyContent="space-between">
+          <Grid item>
+            <img src={`${db.type}-logo.png`} alt={db.type + '-logo'} height={70} />
+          </Grid>
+          <Grid item>
+            <Typography variant="h6">{db.name}</Typography>
+          </Grid>
+          <Grid item>
+            <Typography variant="caption">
+              {new Date(db.createdAt).toUTCString().split(' GMT')[0]}
+            </Typography>
+          </Grid>
+        </Grid>
+        <Grid container justifyContent="space-between">
+          <Grid item>
+            <LinearProgress variant="determinate" value={db.size / MAX_GIGA_SIZE_PER_DATABASE} />
+            Size: {db.size}/{MAX_GIGA_SIZE_PER_DATABASE} GB
+          </Grid>
+          <Grid item>
+            <Typography variant="caption">{db.status}</Typography>
+          </Grid>
+        </Grid>
+        <Grid container justifyContent="space-around" className="db-item-actions-container">
+          <Grid item>
+            <Button
+              variant="contained"
+              color="error"
+              size="small"
+              onClick={() => handleDelete(db.id)}
+              disabled={isLoading}
+            >
+              Delete
+              {isLoading && <CircularProgress size={20} />}
+            </Button>
+          </Grid>
+          <Grid item>
+            <a href={`/api/admin/inspect/${db.id}`} target="_blank" rel="noopener noreferrer">
+              <Button variant="outlined" color="primary" size="small" disabled={isLoading}>
+                Inspect
+              </Button>
+            </a>
+          </Grid>
+        </Grid>
+      </DbBox>
+    </Grid>
   );
 };

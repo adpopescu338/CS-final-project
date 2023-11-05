@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Typography, Box, Divider } from '@mui/material';
 import { NewDb, Databases } from 'src/components/Databases';
-import { authedPage } from 'src/lib/HOC';
+import { authedPage } from 'src/fe-lib/HOC';
 
 export const Dashboard = authedPage(() => {
   return (
