@@ -20,10 +20,4 @@ Object.values(allEndpoints).forEach((details: EndpointDetails) => {
   router[details.method](...endpoint);
 });
 
-router.get('/hello', (req, res) => {
-  res.send({
-    message: 'Hello World!',
-  });
-});
-
 export { router };

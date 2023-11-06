@@ -29,7 +29,7 @@ model Database {
   createdAt              DateTime        @default(now())
   user                   User            @relation(fields: [userId], references: [id])
   userId                 String
-  size                   Int             @default(0)
+  size                   Float           @default(0) // in MB
   pod                    Pod             @relation(fields: [podId], references: [id])
   podId                  String
   scheduledEmail         ScheduledEmail?
@@ -44,7 +44,7 @@ model Database {
 enum DatabaseStatus {
   Deploying
   Active
-  Stopped
+  Locked // used too much space
   Deleted
 }
 

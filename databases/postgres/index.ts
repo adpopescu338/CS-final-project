@@ -5,6 +5,7 @@ import { deleteDatabase } from './deleteDatabase';
 import { Client } from 'pg';
 import { DBManager, ConnectionDetails, UserDetails, InternalConnectionDetails } from '../DBManager';
 import { getWholeDbSize } from './getWholeDbSize';
+import { lockDatabase } from './lockDatabase';
 
 class PostgresManager implements DBManager<Client> {
   connect(connectionDetails: ConnectionDetails | InternalConnectionDetails) {
@@ -38,6 +39,15 @@ class PostgresManager implements DBManager<Client> {
   async getWholeDbSize(connectionDetails: InternalConnectionDetails) {
     const db = await this.connect(connectionDetails);
     return getWholeDbSize(db);
+  }
+
+  async lockDatabase(
+    username: string,
+    database: string,
+    connectionDetails: InternalConnectionDetails
+  ) {
+    const db = await this.connect(connectionDetails);
+    return lockDatabase(db, database);
   }
 }
 

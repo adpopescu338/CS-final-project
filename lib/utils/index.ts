@@ -3,3 +3,4 @@ export { waitFor } from './waitFor';
 export { encrypt, decrypt } from './encryption';
 export { getTokenCookieOptions } from './getTokenCookieOptions';
 export { getDbManager } from './getDbManager';
+export { getPort } from './getPort';

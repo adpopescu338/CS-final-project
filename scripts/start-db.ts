@@ -30,6 +30,8 @@ const startDeployment = async () => {
   await wait(5000);
   const { deploy } = await import('libs/k8');
   await deploy('postgresql', false);
+  await wait(5000);
+  spawn('yarn prisma migrate deploy', { shell: true, stdio: 'inherit' });
 };
 
 const child = spawn(cmd, { shell: true });

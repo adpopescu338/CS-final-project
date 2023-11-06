@@ -7,6 +7,7 @@ import { errorHandler } from './lib/middleware';
 import { setDbPublicIpAddress } from './lib/k8/setDbPublicIpAddress';
 import { checkMandatoryEnvVariables } from './lib/checkMandatoryEnvVariables';
 import cookies from 'cookie-parser';
+import { Cron } from 'libs/cron/Cron';
 
 config();
 
@@ -38,4 +39,6 @@ app.listen(PORT, async () => {
     console.error(e);
     process.exit(1);
   }
+
+  Cron.start();
 });

@@ -66,4 +66,16 @@ export interface DBManager<Client> {
    * The connection details are going to be the same for all databases (the admin user), but the host can be different
    */
   getWholeDbSize(connectionDetails: InternalConnectionDetails): Promise<number>;
+
+  /**
+   * @description Lock a database (prevent writes)
+   * @param username the username of the user to lock
+   * @param databaseName the name of the database to lock
+   * @param connectionDetails the internal connection details
+   */
+  lockDatabase(
+    username: string,
+    databaseName: string,
+    connectionDetails: InternalConnectionDetails
+  ): Promise<void>;
 }

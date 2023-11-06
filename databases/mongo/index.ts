@@ -5,6 +5,7 @@ import { deleteDatabase } from './deleteDatabase';
 import { MongoClient } from 'mongodb';
 import { DBManager, ConnectionDetails, UserDetails, InternalConnectionDetails } from '../DBManager';
 import { getWholeDbSize } from './getWholeDbSize';
+import { lockDatabase } from './lockDatabase';
 
 class MongoManager implements DBManager<MongoClient> {
   connect(connectionDetails: ConnectionDetails | InternalConnectionDetails) {
@@ -39,6 +40,15 @@ class MongoManager implements DBManager<MongoClient> {
   async getWholeDbSize(connectionDetails: InternalConnectionDetails) {
     const db = await this.connect(connectionDetails);
     return getWholeDbSize(db);
+  }
+
+  async lockDatabase(
+    username: string,
+    database: string,
+    connectionDetails: InternalConnectionDetails
+  ) {
+    const db = await this.connect(connectionDetails);
+    return lockDatabase(db, username, database);
   }
 }
 

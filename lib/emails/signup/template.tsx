@@ -2,12 +2,12 @@ import * as React from 'react';
 import { Html } from '@react-email/html';
 import { render } from '@react-email/render';
 
-export type SignUpProps = {
+export type TemplateProps = {
   name: string;
   otp: string;
 };
 
-const Signup = ({ name, otp }: SignUpProps) => {
+const Template = ({ name, otp }: TemplateProps) => {
   return (
     <Html lang="en">
       <h1>Hi {name}</h1>
@@ -16,4 +16,4 @@ const Signup = ({ name, otp }: SignUpProps) => {
   );
 };
 
-export const renderTemplate = (props: SignUpProps) => render(<Signup {...props} />);
+export const renderTemplate = (props: TemplateProps) => render(<Template {...props} />);

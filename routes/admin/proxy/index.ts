@@ -3,7 +3,7 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const withAdminer = process.env.WITH_ADMINER !== 'false';
 
-export const ADMINER_ADDRESS = `http://127.0.0.1:${ADMINER_PORT}`;
+const ADMINER_ADDRESS = `http://127.0.0.1:${ADMINER_PORT}`;
 
 if (withAdminer) {
   import('node-adminer').then((adminer) => {

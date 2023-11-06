@@ -11,7 +11,7 @@ export const getWholeDbSize = async (db: Connection): Promise<number> =>
         }
         console.log('mysql getWholeDbSize result', result);
         // return result in megabytes
-        resolve(result[0]['total_size_in_MB']);
+        resolve(Number(result[0]['total_size_in_MB']));
       }
     );
   });

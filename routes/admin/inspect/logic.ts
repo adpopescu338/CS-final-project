@@ -4,7 +4,6 @@ import { client } from 'prisma/client';
 import { ReqPayload } from './schemas';
 import { BeError } from 'libs/BeError';
 import { ErrorCodes } from 'libs/constants';
-import { ADMINER_ADDRESS } from '../proxy/index';
 import { decrypt } from 'libs/utils';
 
 export const logic = async (req: AuthedRequest, res: Response) => {
@@ -33,7 +32,7 @@ export const logic = async (req: AuthedRequest, res: Response) => {
     db: db.name,
   });
 
-  res.redirect(ADMINER_ADDRESS + '?' + url.toString());
+  res.redirect('/admin?' + url.toString());
 };
 
 const getAdminerDriver = (db: DBMS) => {

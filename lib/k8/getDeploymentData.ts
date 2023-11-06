@@ -1,18 +1,6 @@
-import { MONGO_PORT, MYSQL_PORT, POSTGRES_PORT, POD_STORAGE_GIGA } from 'libs/constants';
+import { POD_STORAGE_GIGA } from 'libs/constants';
 import { DBMS } from 'libs/types';
-
-const getPort = (db: DBMS) => {
-  switch (db) {
-    case DBMS.mongodb:
-      return MONGO_PORT;
-    case DBMS.postgresql:
-      return POSTGRES_PORT;
-    case DBMS.mysql:
-      return MYSQL_PORT;
-    default:
-      throw new Error('Invalid DBMS');
-  }
-};
+import { getPort } from 'libs/utils';
 
 const getDockerImageName = (db: DBMS) => {
   switch (db) {

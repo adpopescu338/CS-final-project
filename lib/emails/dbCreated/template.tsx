@@ -3,7 +3,7 @@ import { Html } from '@react-email/html';
 import { render } from '@react-email/render';
 import { DBMS } from '@prisma/client';
 
-export type DbCreatedProps = {
+export type TemplateProps = {
   password: string;
   port: number;
   host: string;
@@ -21,7 +21,7 @@ const DbCreated = ({
   database,
   connectionString,
   dbms,
-}: DbCreatedProps) => {
+}: TemplateProps) => {
   return (
     <Html lang="en">
       <div
@@ -43,4 +43,4 @@ const DbCreated = ({
   );
 };
 
-export const renderTemplate = (props: DbCreatedProps) => render(<DbCreated {...props} />);
+export const renderTemplate = (props: TemplateProps) => render(<DbCreated {...props} />);
