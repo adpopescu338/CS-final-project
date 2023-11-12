@@ -37,7 +37,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^5.7.0",
     "mysql2": "^3.5.2",
-    "node-adminer": "https://github.com/adpopescu338/node-adminer",
+    "node-adminer": "^1.2.2",
     "nodemon": "^3.0.1",
     "pg": "^8.11.2",
     "prisma": "^5.2.0",

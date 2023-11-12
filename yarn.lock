@@ -8011,9 +8011,10 @@ no-case@^3.0.4:
     lower-case "^2.0.2"
     tslib "^2.0.3"
 
-"node-adminer@https://github.com/adpopescu338/node-adminer":
+node-adminer@^1.2.2:
   version "1.2.2"
-  resolved "https://github.com/adpopescu338/node-adminer#72ee06132c8cc97dff6dd1427a319c8cb7b8fc60"
+  resolved "https://registry.yarnpkg.com/node-adminer/-/node-adminer-1.2.2.tgz#89ebba59d1f81250bd35b956871662819bb3e3a0"
+  integrity sha512-Ed5aG35IkGEELSRvs2Qjn/bxmfaVso6sVW69kvzES/t3cO7xRYQmW1jvV8OKVvERGO8vO8zxNnrY2poXZxAOAA==
   dependencies:
     download "^8.0.0"
     fs-extra "^11.1.1"

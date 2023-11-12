@@ -19,51 +19,6 @@ spec:
           image: adpopescu3382/devops-playground:cs-express
           ports:
             - containerPort: 3000
-          env:
-            - name: MONGO_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: apps-secrets
-                  key: MONGO_USERNAME
-            - name: MONGO_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: apps-secrets
-                  key: MONGO_PASSWORD
-            - name: MONGO_HOST
-              value: 'mongo-service.default.svc.cluster.local'
-            - name: MYSQL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: apps-secrets
-                  key: MYSQL_PASSWORD
-            - name: MYSQL_HOST
-              value: 'mysql-service.default.svc.cluster.local'
-            - name: POSTGRES_PASSWORD
-            valueFrom:
-              secretKeyRef:
+          envFrom:
+            - secretRef:
                 name: apps-secrets
-                key: POSTGRES_PASSWORD
-            - name: POSTGRES_HOST
-              value: 'postgres-service.default.svc.cluster.local'
-            - name: POSTGRES_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: apps-secrets
-                  key: POSTGRES_USERNAME
-            - name: SENDGRID_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: apps-secrets
-                  key: SENDGRID_API_KEY
-            - name: SENDGRID_FROM_EMAIL
-              valueFrom:
-                secretKeyRef:
-                  name: apps-secrets
-                  key: SENDGRID_FROM_EMAIL
-            - name: JWT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: apps-secrets
-                  key: JWT_SECRET
-            
