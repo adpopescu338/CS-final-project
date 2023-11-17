@@ -1,0 +1,1 @@
+This is a copy of the master branch before switching to docker compose because EKS was too expensive.
