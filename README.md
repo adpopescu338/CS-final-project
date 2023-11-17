@@ -1,39 +1,38 @@
-## CS
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-This is a repository for my Computer Science final project.
-As a computer science student, I was often asked to install different databases on my computer, and it was often a hassle to do so.
-This website is meant to be a simple and friction-less way to set-up a database in the cloud and use it for your projects.
-Ideally I would use kubernetes to scale the databases, but I don't have money to pay for a kubernetes cluster, so I'll just use docker for now, and deploy the website on heroku or something.
+## Getting Started
 
-## Development
+First, run the development server:
 
-`scripts/start-db.sh` will start the databases in a kubernetes cluster. You need minikube installed for this to work.
-
-`yarn dev` will start both the server and the client in development mode.
-
-## Backend
-
-### Validation
-
-```
-import { validate } from './lib/middleware';
-import * as yup from 'yup';
-
-const schemaValidator: yup.Schema = yup.object({
-  query: yup.object().shape({
-    age: yup.number().required().min(18).max(601),
-  }),
-});
-...
-app.get('/', validate(schemaValidator), (req, res) => {
- ...
-});
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
 ```
 
-## Adminer
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-Adminer is a database management tool that allows you to manage your databases from a web interface.
-It supports multiple databases.
-We need to start a PHP server for it to work, on a different port than the one we use for the API.
-We use a proxy to redirect the requests to /admin\* to the PHP server.
-In development it doesn't work properly. To test, run `yarn build` and then `yarn start` and go to `localhost:3000/admin`.
+You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+
+[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+
+The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+
+This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.

@@ -1,94 +1,23 @@
 {
-  "type": "commonjs",
-  "name": "cs",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "MIT",
+  "name": "easydb",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "dev:fe": "PORT=3001 BUILD_PATH='./.client-dist' react-scripts start",
-    "dev:be": "nodemon",
-    "dev": "concurrently \"yarn dev:be\" \"yarn dev:fe\"",
-    "build:fe": "BUILD_PATH='./.client-dist' react-scripts build",
-    "build:be": "tsc",
-    "build": "tsc && yarn build:fe",
-    "start": "nodemon .dist/index.js",
-    "postinstall": "node prisma/prepare.mjs",
-    "start-db": "ts-node -r tsconfig-paths/register scripts/start-db.ts"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.1",
-    "@emotion/styled": "^11.11.0",
-    "@kubernetes/client-node": "^0.18.1",
-    "@mui/material": "^5.14.12",
-    "@prisma/client": "^5.2.0",
-    "@react-email/html": "^0.0.4",
-    "@react-email/render": "^0.0.7",
-    "@sendgrid/mail": "^7.7.0",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.40",
-    "@types/react": "^18.2.20",
-    "@types/react-dom": "^18.2.7",
-    "bcryptjs": "^2.4.3",
-    "concurrently": "^8.2.0",
-    "cookie-parser": "^1.4.6",
-    "cors": "^2.8.5",
-    "express": "^4.18.2",
-    "http-proxy-middleware": "^2.0.6",
-    "jsonwebtoken": "^9.0.2",
-    "mongodb": "^5.7.0",
-    "mysql2": "^3.5.2",
-    "node-adminer": "^1.2.2",
-    "nodemon": "^3.0.1",
-    "pg": "^8.11.2",
-    "prisma": "^5.2.0",
-    "react": "^18.2.0",
-    "react-app-rewired": "^2.2.1",
-    "react-dom": "^18.2.0",
-    "react-query": "^3.39.3",
-    "react-router-dom": "^6.16.0",
-    "react-scripts": "5.0.1",
-    "sweetalert": "^2.1.2",
-    "typescript": "^5.1.6",
-    "yup": "^1.2.0"
-  },
-  "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
-    "@types/bcryptjs": "^2.4.3",
-    "@types/cookie-parser": "^1.4.4",
-    "@types/cors": "^2.8.13",
-    "@types/express": "^4.17.17",
-    "@types/jsonwebtoken": "^9.0.2",
-    "@types/pg": "^8.10.2",
-    "@types/uuid": "^9.0.3",
-    "dotenv": "^16.3.1",
-    "ts-node": "^10.9.1",
-    "tsconfig-paths": "^4.2.0"
-  },
-  "nodemonConfig": {
-    "ignore": [
-      "src",
-      "public"
-    ],
-    "ext": ".ts",
-    "exec": "ts-node -r tsconfig-paths/register index.ts"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "proxy": "http://localhost:3000"
+    "@next/font": "14.0.3",
+    "@types/node": "20.9.1",
+    "@types/react": "18.2.37",
+    "@types/react-dom": "18.2.15",
+    "eslint": "8.53.0",
+    "eslint-config-next": "14.0.3",
+    "next": "14.0.3",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "typescript": "5.2.2"
+  }
 }
