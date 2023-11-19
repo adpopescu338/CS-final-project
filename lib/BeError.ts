@@ -1,4 +1,4 @@
-import { ErrorCodes } from './constants/shared';
+import { ErrorCodes } from 'lib/constants';
 
 const statusCodes = {
   [ErrorCodes.NotFound]: 404,

@@ -1,5 +1,5 @@
-import { MONGO_PORT, MYSQL_PORT, POSTGRES_PORT } from 'libs/constants';
-import { DBMS } from 'libs/types';
+import { DBMS } from '@prisma/client';
+import { MONGO_PORT, MYSQL_PORT, POSTGRES_PORT } from 'lib/constants';
 
 export const getPort = (db: DBMS) => {
   switch (db) {

@@ -1,6 +1,6 @@
 import { UserDetails, UserCreatedDetails } from '../DBManager';
 import { Connection } from 'mysql2';
-import { MYSQL_PORT } from 'libs/constants/backend';
+import { MYSQL_PORT } from 'lib/constants';
 
 export const createDbAndUser = async (
   connection: Connection,

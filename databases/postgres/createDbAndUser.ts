@@ -1,6 +1,6 @@
 import { Client } from 'pg';
 import { UserCreatedDetails, UserDetails } from '../DBManager';
-import { POSTGRES_PORT } from 'libs/constants/backend';
+import { POSTGRES_PORT } from 'lib/constants';
 
 export const createDbAndUser = async (
   client: Client,

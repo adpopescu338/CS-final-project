@@ -11,7 +11,7 @@ const Template = ({ name, otp }: TemplateProps) => {
   return (
     <Html lang="en">
       <h1>Hi {name}</h1>
-      <h2>Here's your token: {otp}</h2>
+      <h2>Here&apos;s your token: {otp}</h2>
     </Html>
   );
 };

@@ -1,6 +1,6 @@
 import { DBMS } from '@prisma/client';
-import { BeError } from 'libs/BeError';
-import { ErrorCodes } from 'libs/constants';
+import { BeError } from 'lib/BeError';
+import { ErrorCodes } from 'lib/constants';
 import { mongoManager, mysqlManager, postgresManager } from 'databases';
 
 export const getDbManager = (dbType: DBMS) => {

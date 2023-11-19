@@ -1,6 +1,6 @@
 import pg from 'pg';
 import { ConnectionDetails, InternalConnectionDetails } from '../DBManager';
-import { POSTGRES_PORT } from 'libs/constants/backend';
+import { POSTGRES_PORT } from 'lib/constants';
 
 const getDefaultConnectionDetails = (
   details: ConnectionDetails | InternalConnectionDetails

@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 import { ConnectionDetails, InternalConnectionDetails } from '../DBManager';
-import { MONGO_PORT } from 'libs/constants/backend';
+import { MONGO_PORT } from 'lib/constants';
 
 const getDefaultConnectionDetails = (
   details: ConnectionDetails | InternalConnectionDetails

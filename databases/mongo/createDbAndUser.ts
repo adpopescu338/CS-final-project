@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 import { UserDetails, UserCreatedDetails } from '../DBManager';
-import { MONGO_PORT } from 'libs/constants/backend';
+import { MONGO_PORT } from 'lib/constants';
 
 export const createDbAndUser = async (
   db: MongoClient,

@@ -1,6 +1,6 @@
 import mysql, { Connection } from 'mysql2';
 import { ConnectionDetails, InternalConnectionDetails } from '../DBManager';
-import { MYSQL_PORT } from 'libs/constants/backend';
+import { MYSQL_PORT } from 'lib/constants';
 
 const connectionsMap = new Map();
 

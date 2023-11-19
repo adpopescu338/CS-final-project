@@ -15,7 +15,7 @@ const Template = ({ database, dbms }: TemplateProps) => {
         <h3>Database Locked</h3>
         <p>
           Your {dbms} database <strong>{database}</strong> reached the maximum space allowed.
-          There's nothing we can do about it at the moment. In future you'll be able to upgrade your
+          There&apos;s nothing we can do about it at the moment. In future you&apos;ll be able to upgrade your
           database to a bigger one, but that feature is not available yet.
         </p>
       </div>
