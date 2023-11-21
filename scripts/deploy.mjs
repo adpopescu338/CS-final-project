@@ -1,87 +1,32 @@
+import { config } from 'dotenv';
 import { spawn } from 'child_process';
-import { writeFileSync } from 'fs';
+import { checkMandatoryEnvVariables } from './checkMandatoryEnvVariables.mjs';
 
-const envVariableKeys = await new Promise((resolve, reject) => {
-  const child = spawn(`aws ssm describe-parameters --query "Parameters[*].Name"`, {
-    shell: true,
-  });
-  child.stdout.setEncoding('utf8');
-  child.stderr.setEncoding('utf8');
-
-  child.stdout.on('data', (data) => {
-    child.kill();
-    resolve(JSON.parse(data));
-  });
-
-  child.stderr.on('data', (data) => {
-    child.kill();
-    reject(data);
-  });
-
-  child.on('close', (code) => {
-    if (code) {
-      reject(`child process exited with code ${code}`);
-    }
-  });
+config({
+  path: '.env',
 });
 
-let envVariables = await Promise.all(
-  envVariableKeys.map((key) => {
-    return new Promise((resolve, reject) => {
-      const child = spawn(
-        `aws ssm get-parameter --name ${key} --with-decryption --query "Parameter.Value"`,
-        {
-          shell: true,
-        }
-      );
-      child.stdout.setEncoding('utf8');
-      child.stderr.setEncoding('utf8');
+checkMandatoryEnvVariables();
 
-      child.stdout.on('data', (data) => {
-        child.kill();
-        resolve({
-          [key]: JSON.parse(data),
-        });
-      });
+const argv = process.argv.slice(2);
+const local = argv.includes('--local');
 
-      child.stderr.on('data', (data) => {
-        child.kill();
-        reject(data);
-      });
-
-      child.on('close', (code) => {
-        if (code) {
-          reject(`child process exited with code ${code}`);
-        }
-      });
-    });
-  })
+const { MONGO_USERNAME, MONGO_PASSWORD, MYSQL_PASSWORD, POSTGRES_PASSWORD } = process.env;
+const missingVariables = [MONGO_USERNAME, MONGO_PASSWORD, MYSQL_PASSWORD, POSTGRES_PASSWORD].filter(
+  (variable) => !variable
 );
 
-envVariables = envVariables.reduce(
-  (acc, curr) => {
-    return {
-      ...acc,
-      ...curr,
-    };
-  },
+if (missingVariables.length) {
+  throw new Error(`Missing environment variables: ${missingVariables}`);
+}
+
+spawn(
+  'docker-compose',
+  // on local, only start the databases
+  // the next app will be started with `yarn dev`
+  local ? ['up', 'postgres', 'mongodb', 'mysql'] : ['up'],
   {
-    DATABASE_URL: `postgres://postgres:${envVariables.POSTGRES_PASSWORD}@postgres:5432`,
+    stdio: 'inherit',
+    env: process.env,
   }
 );
-
-writeFileSync(
-  '.env',
-  Object.keys(envVariables)
-    .map((key) => `${key}=${envVariables[key]}`)
-    .join('\n')
-);
-
-spawn('docker-compose', ['up'], {
-  shell: true,
-  stdio: 'inherit',
-  env: {
-    ...process.env,
-    ...envVariables,
-  },
-});

@@ -3,7 +3,7 @@ import { decrypt, getDbManager } from 'lib/utils';
 import { sendDbLockedEmail } from 'lib/emails';
 import { client } from 'prisma/client';
 import { MAX_GIGA_SIZE_PER_DATABASE } from 'lib/constants';
-import { getServiceInternalAddress } from 'lib/getServiceInternalAddress';
+import { getDatabaseHost } from 'lib/getDatabaseHost';
 
 const dbCheckSizeSelector = {
   where: {
@@ -36,7 +36,7 @@ class CronClass {
     await Promise.all(
       databases.map(async (db) => {
         const dbManager = getDbManager(db.type);
-        const size = await dbManager.getWholeDbSize({ host: getServiceInternalAddress(db.type) });
+        const size = await dbManager.getWholeDbSize({ host: getDatabaseHost(db.type) });
         if (!size || size === db.size) {
           console.log(`Cron:: No size change for ${db.name}`);
           return;
@@ -75,7 +75,7 @@ class CronClass {
   async lockDbForExceedingSize(db: DbCheckSizeValue) {
     const dbManager = getDbManager(db.type);
     await dbManager.lockDatabase(decrypt(db.encryptedUsername), db.name, {
-      host: getServiceInternalAddress(db.type),
+      host: getDatabaseHost(db.type),
     });
 
     await Promise.all([

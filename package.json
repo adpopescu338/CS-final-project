@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "START_ADMINER=false next build",
     "start": "next start",
     "lint": "next lint",
-    "deploy-local": "node scripts/deploy.local.mjs",
+    "deploy-local": "node scripts/deploy.mjs --local",
     "deploy": "node scripts/deploy.mjs"
   },
   "dependencies": {

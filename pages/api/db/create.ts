@@ -14,7 +14,7 @@ import { NextAuthUser } from 'lib/next-auth';
 import * as yup from 'yup';
 import { apiHandler } from 'lib/middleware';
 import { NextApiResponse } from 'next';
-import { getServiceInternalAddress } from 'lib/getServiceInternalAddress';
+import { getDatabaseHost } from 'lib/getDatabaseHost';
 
 export type ReqPayload = {
   body: {
@@ -51,7 +51,7 @@ const createDbAndUser = async (
   };
 
   const internalConnectionDetails = {
-    host: getServiceInternalAddress(dbType),
+    host: getDatabaseHost(dbType),
   };
 
   let userConnectionDetails: UserCreatedDetails;

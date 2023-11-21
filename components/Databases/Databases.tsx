@@ -3,7 +3,7 @@ import { req } from 'lib/Req';
 import swal from 'sweetalert';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { queryKeys } from 'lib/constants/query-keys';
-import { Box, Button, CircularProgress, Grid, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Grid, Tooltip, Typography } from '@mui/material';
 import styled from '@emotion/styled';
 import LinearProgress from '@mui/material/LinearProgress';
 import { MAX_GIGA_SIZE_PER_DATABASE } from 'lib/constants';
@@ -139,11 +139,26 @@ const Database: React.FC<{
             </Button>
           </Grid>
           <Grid item>
-            <a href={`/api/admin/inspect/${db.id}`} target="_blank" rel="noopener noreferrer">
-              <Button variant="outlined" color="primary" size="small" disabled={isLoading}>
-                Inspect
-              </Button>
-            </a>
+            {db.type === 'mongodb' ? (
+              <Tooltip title="Coming soon" arrow placement="top">
+                {
+                  <Button variant="outlined" color="primary" size="small">
+                    Inspect
+                  </Button>
+                }
+              </Tooltip>
+            ) : (
+              <a
+                href={`/api/admin/inspect?id=${db.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                content="application/json"
+              >
+                <Button variant="outlined" color="primary" size="small" disabled={isLoading}>
+                  Inspect
+                </Button>
+              </a>
+            )}
           </Grid>
         </Grid>
       </DbBox>

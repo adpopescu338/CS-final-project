@@ -6,7 +6,8 @@ import { BeError } from 'lib/BeError';
 import { ErrorCodes } from 'lib/constants';
 import { NextApiResponse } from 'next';
 import * as yup from 'yup';
-import { getServiceInternalAddress } from 'lib/getServiceInternalAddress';
+import { getDatabaseHost } from 'lib/getDatabaseHost';
+import { apiHandler } from 'lib/middleware';
 
 export type Result = {
   success: true;
@@ -40,7 +41,7 @@ export const logic = async (req: AuthedRequest, res: NextApiResponse) => {
   const dbManager = getDbManager(db.type);
 
   const connectionDetails = {
-    host: getServiceInternalAddress(db.type),
+    host: getDatabaseHost(db.type),
   };
 
   await dbManager.deleteDatabase(db.name, connectionDetails);
@@ -61,3 +62,5 @@ export const logic = async (req: AuthedRequest, res: NextApiResponse) => {
 
   res.status(200).json(result);
 };
+
+export default apiHandler(true, schema).delete(logic);

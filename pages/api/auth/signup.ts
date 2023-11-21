@@ -7,6 +7,7 @@ import { sendSignupEmail } from 'lib/emails';
 import { NextApiRequest, NextApiResponse } from 'next';
 import * as yup from 'yup';
 import { User } from '@prisma/client';
+import { apiHandler } from 'lib/middleware';
 
 export type ReqPayload = {
   body: {
@@ -75,3 +76,5 @@ export const logic = async (req: NextApiRequest, res: NextApiResponse) => {
 
   res.status(201).send(result);
 };
+
+export default apiHandler(false, schema).post(logic);

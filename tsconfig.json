@@ -18,6 +18,6 @@
     "incremental": true,
     "baseUrl": "."
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "scripts/checkMandatoryEnvVariables.js"],
   "exclude": ["node_modules"]
 }

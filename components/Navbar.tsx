@@ -28,9 +28,14 @@ export const Navbar = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const logout = useMutation(() => {
+    signOut({
+      redirect: false,
+      callbackUrl: '/',
+    });
 
-  // @ts-expect-error
-  const logout = useMutation(() => signOut);
+    return push('/');
+  });
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -87,14 +92,7 @@ export const Navbar = () => {
                     >
                       Settings
                     </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        push('/');
-                        logout.mutate();
-                      }}
-                    >
-                      Logout
-                    </MenuItem>
+                    <MenuItem onClick={() => logout.mutate()}>Logout</MenuItem>
                   </Menu>
                 </div>
               ) : (

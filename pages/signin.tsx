@@ -1,6 +1,4 @@
 import * as React from 'react';
-import { useRouter } from 'next/router';
-import { req } from 'lib/Req';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -11,7 +9,6 @@ import swal from 'sweetalert';
 import { signIn } from 'next-auth/react';
 
 const Signin = () => {
-  const { push } = useRouter();
   const [loading, setLoading] = React.useState(false);
   const [values, setValues] = React.useState({
     email: '',
@@ -22,17 +19,12 @@ const Signin = () => {
     event.preventDefault();
     setLoading(true);
     try {
-      await signIn(
-        'credentials',
-        {
-          redirect: false,
-          callbackUrl: '/dashboard',
-        },
-        {
-          email: values.email,
-          password: values.password,
-        }
-      );
+      await signIn('credentials', {
+        redirect: true,
+        callbackUrl: '/dashboard',
+        username: values.email,
+        password: values.password,
+      });
     } catch (err: any) {
       swal(err.message);
     } finally {

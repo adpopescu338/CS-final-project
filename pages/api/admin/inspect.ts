@@ -2,10 +2,12 @@ import { AuthedRequest } from 'lib/types/AuthedRequest';
 import { client } from 'prisma/client';
 import { BeError } from 'lib/BeError';
 import { ErrorCodes } from 'lib/constants';
-import { decrypt } from 'lib/utils';
+import { decrypt, getPort } from 'lib/utils';
 import * as yup from 'yup';
 import { DBMS } from '@prisma/client';
 import { apiHandler } from 'lib/middleware';
+import { NextApiResponse } from 'next';
+import { getDatabaseHost } from 'lib/getDatabaseHost';
 
 export type ReqPayload = {
   query: {
@@ -19,7 +21,7 @@ const schema: yup.Schema<ReqPayload> = yup.object().shape({
   }),
 });
 
-export const logic = async (req: AuthedRequest, res: Response) => {
+export const logic = async (req: AuthedRequest, res: NextApiResponse) => {
   const { id } = req.query as ReqPayload['query'];
   const db = await client.database.findUnique({
     where: {
@@ -31,14 +33,19 @@ export const logic = async (req: AuthedRequest, res: Response) => {
     throw new BeError('Database not found', ErrorCodes.NotFound);
   }
 
-  const url = new URLSearchParams({
-    [getAdminerDriver(db.type)]: '',
-    server: process.env.PUBLIC_URL as string,
+  const port = getPort(db.type);
+  const server = getDatabaseHost(db.type, true) + ':' + port;
+
+  const params = new URLSearchParams({
+    [getAdminerDriver(db.type)]: server,
     username: decrypt(db.encryptedUsername),
     db: db.name,
   });
 
-  //res.redirect('/admin?' + url.toString()); // TODO: fix this
+  const url = `${process.env.PUBLIC_URL}/admin?` + params.toString();
+  console.log('redirecting to', url);
+
+  res.redirect(url);
 };
 
 const getAdminerDriver = (db: DBMS) => {

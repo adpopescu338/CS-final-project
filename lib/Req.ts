@@ -5,22 +5,22 @@ import * as Databases from 'pages/api/db';
 import * as DeleteDb from 'pages/api/db/[id]/delete';
 
 class Requestor {
-  signup(data: Signup.ReqPayload['body']) {
-    return this.post<Signup.Result>('/api/signup', data);
-  }
+  signup = (data: Signup.ReqPayload['body']) => {
+    return this.post<Signup.Result>('/api/auth/signup', data);
+  };
 
-  confirmOtp(otp: string) {
-    return this.post('/api/confirm-otp', { otp });
-  }
+  confirmOtp = (otp: string) => {
+    return this.post('/api/auth/confirm-otp', { otp });
+  };
 
-  async getDatabases() {
+  getDatabases = async () => {
     const d = await this.get<Databases.Result>('/api/db');
     return d.data;
-  }
+  };
 
-  createNewDb(body: NewDb.ReqPayload['body']) {
+  createNewDb = (body: NewDb.ReqPayload['body']) => {
     return this.post<NewDb.Result>(`/api/db/create`, body);
-  }
+  };
 
   deleteDb = (id: string) => {
     return this.delete<DeleteDb.Result>(`/api/db/${id}/delete`);

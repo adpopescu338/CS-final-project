@@ -1,6 +1,7 @@
 import { MongoClient } from 'mongodb';
 import { UserDetails, UserCreatedDetails } from '../DBManager';
 import { MONGO_PORT } from 'lib/constants';
+import { getDatabaseHost } from 'lib/getDatabaseHost';
 
 export const createDbAndUser = async (
   db: MongoClient,
@@ -16,10 +17,12 @@ export const createDbAndUser = async (
     throw new Error('Failed to create user');
   }
 
+  const publicHost = getDatabaseHost('mongodb', true);
+
   return {
-    connectionUrl: `mongodb://${username}:${password}@${process.env.MONGO_PUBLIC_HOST}:${MONGO_PORT}/${database}`,
+    connectionUrl: `mongodb://${username}:${password}@${publicHost}:${MONGO_PORT}/${database}`,
     port: MONGO_PORT,
-    host: process.env.MONGO_PUBLIC_HOST as string,
+    host: publicHost,
     username,
     password,
     database,
