@@ -14,6 +14,8 @@ RUN yarn install --frozen-lockfile
 # build app
 RUN yarn build
 
+RUN yarn prisma migrate deploy
+
 EXPOSE 3000
 
 CMD ["yarn", "start"]

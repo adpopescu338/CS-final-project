@@ -58,12 +58,17 @@ let envVariables = await Promise.all(
   })
 );
 
-envVariables = envVariables.reduce((acc, curr) => {
-  return {
-    ...acc,
-    ...curr,
-  };
-}, {});
+envVariables = envVariables.reduce(
+  (acc, curr) => {
+    return {
+      ...acc,
+      ...curr,
+    };
+  },
+  {
+    DATABASE_URL: `postgres://postgres:${envVariables.POSTGRES_PASSWORD}@postgres:5432`,
+  }
+);
 
 writeFileSync(
   '.env',
@@ -78,6 +83,5 @@ spawn('docker-compose', ['up'], {
   env: {
     ...process.env,
     ...envVariables,
-    DATABASE_URL: `postgres://postgres:${envVariables.POSTGRES_PASSWORD}@postgres:5432`,
   },
 });

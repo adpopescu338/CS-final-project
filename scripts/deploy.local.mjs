@@ -1,10 +1,12 @@
 import { config } from 'dotenv';
 import { spawn } from 'child_process';
 
-config();
+config({
+  path: '.env.local',
+});
 
 const { MONGO_USERNAME, MONGO_PASSWORD, MYSQL_PASSWORD, POSTGRES_PASSWORD } = process.env;
-
+console.log({ MONGO_USERNAME, MONGO_PASSWORD, MYSQL_PASSWORD, POSTGRES_PASSWORD });
 const missingVariables = [MONGO_USERNAME, MONGO_PASSWORD, MYSQL_PASSWORD, POSTGRES_PASSWORD].filter(
   (variable) => !variable
 );
