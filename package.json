@@ -7,8 +7,8 @@
     "build": "START_ADMINER=false next build",
     "start": "next start",
     "lint": "next lint",
-    "deploy-local": "node scripts/deploy.mjs --local",
-    "deploy": "node scripts/deploy.mjs"
+    "deploy-local": "node scripts/deploy.js --local",
+    "deploy": "node scripts/deploy.js"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",

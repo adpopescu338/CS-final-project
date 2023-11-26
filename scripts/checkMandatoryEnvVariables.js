@@ -19,7 +19,7 @@ const MANDATORY_ENV_VARIABLES = [
 
 const OPTIONAL_ENV_VARIABLES = ['DISABLE_EMAILS', 'LOG_LEVEL'];
 
-export const checkMandatoryEnvVariables = () => {
+const checkMandatoryEnvVariables = () => {
   const missingEnvVariables = MANDATORY_ENV_VARIABLES.filter(
     (envVariable) => !process.env[envVariable]
   );
@@ -35,3 +35,5 @@ export const checkMandatoryEnvVariables = () => {
     console.warn('Missing optional env variables', missingOptionalVariables);
   }
 };
+
+module.exports = { checkMandatoryEnvVariables };
