@@ -1,15 +1,57 @@
 import { config } from 'dotenv';
 import { spawn } from 'child_process';
 import { checkMandatoryEnvVariables } from './checkMandatoryEnvVariables.mjs';
-
-config({
-  path: '.env',
-});
-
-checkMandatoryEnvVariables();
+import { unlinkSync } from 'fs';
 
 const argv = process.argv.slice(2);
 const local = argv.includes('--local');
+
+const ENV_FILE = local ? '.env.local' : '.TEMP_ENV_FILE';
+
+let decryptionKey;
+
+if (!local) {
+  const passwordArgIndex = argv.findIndex((arg) => arg === '--password');
+  if (passwordArgIndex === -1) {
+    throw new Error('Missing --password argument');
+  }
+
+  decryptionKey = argv[passwordArgIndex + 1];
+
+  if (!decryptionKey) {
+    throw new Error('Missing decryption key');
+  }
+}
+
+if (decryptionKey) {
+  // decrypt .env.gpg to .env
+  await new Promise((resolve, reject) => {
+    const decrypt = spawn('gpg', [
+      '--decrypt',
+      '--batch',
+      '--passphrase',
+      decryptionKey,
+      '.env.gpg',
+    ]);
+    decrypt.stderr.setEncoding('utf8');
+    const write = spawn('tee', [ENV_FILE]);
+    decrypt.stderr.pipe(process.stderr);
+    decrypt.stdout.pipe(write.stdin);
+    decrypt.on('close', (code) => {
+      if (code !== 0) {
+        reject(new Error(`gpg exited with code ${code}`));
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
+config({
+  path: ENV_FILE,
+});
+
+checkMandatoryEnvVariables();
 
 const { MONGO_USERNAME, MONGO_PASSWORD, MYSQL_PASSWORD, POSTGRES_PASSWORD } = process.env;
 const missingVariables = [MONGO_USERNAME, MONGO_PASSWORD, MYSQL_PASSWORD, POSTGRES_PASSWORD].filter(
@@ -30,3 +72,8 @@ spawn(
     env: process.env,
   }
 );
+
+if (!local) {
+  // remove temp env file
+  unlinkSync(ENV_FILE);
+}
