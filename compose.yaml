@@ -7,8 +7,16 @@ services:
       dockerfile: Dockerfile
     ports:
       - '80:3000'
-    env_file:
-      - .env
+    environment:
+      - MONGO_USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - PUBLIC_URL=${PUBLIC_URL}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - SENDGRID_FROM_EMAIL=${SENDGRID_FROM_EMAIL}
+      - NODE_ENV=production
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - NEXTAUTH_TERCES=${NEXTAUTH_TERCES}
     networks:
       - internal_network
     depends_on:
