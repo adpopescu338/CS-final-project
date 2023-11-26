@@ -47,27 +47,18 @@ if [ -n "$DECRYPTION_KEY" ]; then
 else
     echo "Using local environment file."
     DECRYPTED_ENV=$(cat "$ENV_FILE")
+    echo "Environment variables loaded."
 fi
 
 # Export environment variables
 echo "Setting environment variables..."
-eval "$(echo "$DECRYPTED_ENV" | grep -v '^#' | xargs -0)"
-echo "Environment variables set."
-
-# Check mandatory environment variables
-echo "Checking mandatory environment variables..."
-MISSING_VARS=()
-for var in MONGO_USERNAME MONGO_PASSWORD MYSQL_PASSWORD POSTGRES_PASSWORD; do
-    if [ -z "${!var}" ]; then
-        MISSING_VARS+=("$var")
+while IFS='=' read -r name value ; do
+    if [[ $name && $name != "#"* ]]; then
+        export "$name=$value"
+        echo "Set $name=$value"
     fi
-done
-
-if [ ${#MISSING_VARS[@]} -ne 0 ]; then
-    echo "Missing environment variables: ${MISSING_VARS[*]}"
-    exit 1
-fi
-echo "All mandatory environment variables are present."
+done <<< "$DECRYPTED_ENV"
+echo "Environment variables set."
 
 # Run docker-compose
 echo "Running docker-compose..."
