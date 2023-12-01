@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
 import swal from 'sweetalert';
-import { signIn } from 'next-auth/react';
+import { signin } from 'lib/utils';
 
 const Signin = () => {
   const [loading, setLoading] = React.useState(false);
@@ -19,12 +19,7 @@ const Signin = () => {
     event.preventDefault();
     setLoading(true);
     try {
-      await signIn('credentials', {
-        redirect: true,
-        callbackUrl: '/dashboard',
-        username: values.email,
-        password: values.password,
-      });
+      await signin(values.email, values.password);
     } catch (err: any) {
       swal(err.message);
     } finally {
