@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
 import swal from 'sweetalert';
-import { signin } from 'lib/utils';
+import { signin } from 'lib/utils/signin';
 
 const Signin = () => {
   const [loading, setLoading] = React.useState(false);

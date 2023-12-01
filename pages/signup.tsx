@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import swal from 'sweetalert';
-import { signin } from 'lib/utils';
+import { signin } from 'lib/utils/signin';
 
 const Signup = () => {
   const [step, setStep] = React.useState(0);
