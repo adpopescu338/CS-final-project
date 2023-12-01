@@ -31,7 +31,7 @@ else
     echo "Fetching environment variables from AWS Parameter Store..."
     # Fetching all parameters
     while IFS='=' read -r name value; do
-     echo "Setting env $name"
+     echo "Setting env $name to $value"
      export "$name"="$value"
     done < <(aws ssm get-parameters-by-path --path "/" --recursive --with-decryption --query 'Parameters[*].[Name,Value]' --output json | jq -r '.[] | .[0] + "=" + .[1]')
     if [ $? -ne 0 ]; then
