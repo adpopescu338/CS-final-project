@@ -74,7 +74,7 @@ if [ "$LOCAL_MODE" -eq 1 ]; then
     docker-compose up postgres mongodb mysql
 else
     echo "Starting all services..."
-    docker-compose up
+    docker-compose up --build
 fi
 
 echo "Script completed."
