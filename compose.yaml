@@ -1,6 +1,40 @@
 version: '3.8'
 
 services:
+  postgres:
+    image: postgres:latest
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    networks:
+      - internal_network
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+    networks:
+      - internal_network
+
+  mysql:
+    image: mysql:latest
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - internal_network
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+
   next:
     build:
       context: ./
@@ -25,40 +59,6 @@ services:
       - postgres
     volumes:
       - next:/usr/src/app
-
-  mongodb:
-    image: mongo:latest
-    ports:
-      - '27017:27017'
-    volumes:
-      - mongo-data:/data/db
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
-    networks:
-      - internal_network
-
-  postgres:
-    image: postgres:latest
-    ports:
-      - '5432:5432'
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    networks:
-      - internal_network
-
-  mysql:
-    image: mysql:latest
-    ports:
-      - '3306:3306'
-    volumes:
-      - mysql-data:/var/lib/mysql
-    networks:
-      - internal_network
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
 
 volumes:
   next:

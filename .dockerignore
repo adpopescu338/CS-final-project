@@ -3,7 +3,10 @@ client/node_modules
 scripts
 
 .env.local
+.env.prod
+.env
 
 .dist
 .client-dist
 .DS_Store
+scripts/deploy.sh
