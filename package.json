@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "START_ADMINER=false next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "start-prod": "node scripts/checkMandatoryEnvVars.mjs && yarn prisma migrate deploy && yarn start",
+    "start-db": "scripts/deploy.sh --local"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",

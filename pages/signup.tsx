@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import swal from 'sweetalert';
+import { signIn } from 'next-auth/react';
 
 const Signup = () => {
   const [step, setStep] = React.useState(0);
@@ -44,7 +45,12 @@ const Signup = () => {
     try {
       await req.confirmOtp(values.otp);
       setStep(2);
-      await req.signup(values);
+      await signIn('credentials', {
+        redirect: true,
+        callbackUrl: '/dashboard',
+        username: values.email,
+        password: values.password,
+      });
     } catch (err) {
       swal(err.message);
     }
