@@ -64,7 +64,7 @@ fi
 # Set PUBLIC_URL and DATABASE_URL based on the retrieved public DNS
 echo "Setting PUBLIC_URL to http://${PUBLIC_DNS}"
 export PUBLIC_URL="http://${PUBLIC_DNS}"
-echo "Setting DATABASE_URL to postgres://postgres:${POSTGRES_PASSWORD}@${PUBLIC_DNS}:5432"§
+echo "Setting DATABASE_URL to postgres://postgres:${POSTGRES_PASSWORD}@${PUBLIC_DNS}:5432"
 export DATABASE_URL="postgres://postgres:${POSTGRES_PASSWORD}@${PUBLIC_DNS}:5432"
 
 # Run docker-compose
