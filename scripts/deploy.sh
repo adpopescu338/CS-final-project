@@ -1,9 +1,7 @@
 #!/bin/bash
 
 # Initialize variables
-ENV_FILE=".TEMP_ENV_FILE"
 LOCAL_MODE=0
-DECRYPTION_KEY=""
 
 echo "Starting script..."
 
@@ -13,15 +11,8 @@ while [[ $# -gt 0 ]]; do
     case $key in
         --local)
             LOCAL_MODE=1
-            ENV_FILE=".env.local"
             echo "Local mode activated."
             shift # past argument
-            ;;
-        --password)
-            shift # past argument
-            DECRYPTION_KEY="$1"
-            echo "Decryption key provided."
-            shift # past value
             ;;
         *)
             shift # past argument
@@ -29,43 +20,29 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Check if --password is provided when not in local mode
-if [ "$LOCAL_MODE" -eq 0 ] && [ -z "$DECRYPTION_KEY" ]; then
-    echo "Missing --password argument"
-    exit 1
-fi
-
-# Decrypt .env.gpg to a variable or use .env.local
-if [ -n "$DECRYPTION_KEY" ]; then
-    echo "Decrypting environment variables..."
-    DECRYPTED_ENV=$(gpg --decrypt --batch --passphrase "$DECRYPTION_KEY" .env.gpg 2> /dev/null)
+# Load and export environment variables
+if [ "$LOCAL_MODE" -eq 1 ]; then
+    echo "Using local environment file."
+    set -a # automatically export all variables
+    source ".env"
+    set +a
+    echo "Environment variables loaded from file."
+else
+    echo "Fetching environment variables from AWS Parameter Store..."
+    # Fetching all parameters
+    while IFS='=' read -r name value; do
+     echo "Setting env $name"
+     export "$name"="$value"
+    done < <(aws ssm get-parameters-by-path --path "/" --recursive --with-decryption --query 'Parameters[*].[Name,Value]' --output json | jq -r '.[] | .[0] + "=" + .[1]')
     if [ $? -ne 0 ]; then
-        echo "gpg exited with code $?"
+        echo "AWS CLI exited with code $?"
         exit 1
     fi
-    echo "Environment variables decrypted."
-else
-    echo "Using local environment file."
-    DECRYPTED_ENV=$(cat "$ENV_FILE")
-    echo "Environment variables loaded."
+    echo "Environment variables loaded from AWS Parameter Store."
 fi
-
-# Export environment variables
-echo "Setting environment variables..."
-while IFS='=' read -r name value ; do
-    if [[ $name && $name != "#"* ]]; then
-        export "$name=$value"
-        echo "Set $name=$value"
-    fi
-done <<< "$DECRYPTED_ENV"
-echo "Environment variables set."
 
 # Run docker-compose
 echo "Running docker-compose..."
-if [ "$LOCAL_MODE" -eq 1 ]; then
-    docker-compose up postgres mongodb mysql
-else
-    docker-compose up
-fi
+docker-compose up
 
 echo "Script completed."

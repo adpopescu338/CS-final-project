@@ -8,6 +8,8 @@ RUN apk --no-cache add php php-fpm php-json php-common php-session
 
 # Copy the file from your host to your current location
 COPY . .
+
+ENV NODE_ENV=production
 # install dependencies, lockfile
 RUN yarn install --frozen-lockfile
 
