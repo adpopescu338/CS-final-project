@@ -43,6 +43,13 @@ fi
 
 # Run docker-compose
 echo "Running docker-compose..."
-docker-compose up
+if [ "$LOCAL_MODE" -eq 1 ]; then
+    echo "Starting local services..."
+    docker-compose up postgres mongodb mysql
+else
+    echo "Starting all services..."
+    docker-compose up
+fi
+
 
 echo "Script completed."
