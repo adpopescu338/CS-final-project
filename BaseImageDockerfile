@@ -11,6 +11,9 @@ RUN apk --no-cache add php php-fpm php-json php-common php-session
 COPY package*.json ./
 COPY yarn.lock ./
 
+# Copy prisma/schema.prisma to generate prisma client
+COPY prisma/schema.prisma ./prisma/
+
 ENV NODE_ENV=production
 # install dependencies, lockfile
 RUN yarn install --frozen-lockfile
