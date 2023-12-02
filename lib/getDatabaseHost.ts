@@ -5,7 +5,10 @@ export const getDatabaseHost = (type: DBMS, publicHost = false) => {
     return '127.0.0.1';
   }
 
-  const publicAddress = (process.env.PUBLIC_URL as string).split('//')[1].split(':')[0];
+  const publicAddress = (process.env.PUBLIC_URL as string)
+    .replace('https://', '')
+    .replace('http://', '')
+    .split(':')[0];
 
   switch (type) {
     case DBMS.mysql:

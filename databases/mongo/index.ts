@@ -18,8 +18,8 @@ class MongoManager implements DBManager<MongoClient> {
   }
 
   async deleteUser(username: string, connectionDetails: InternalConnectionDetails) {
-    const client = await this.connect(connectionDetails);
-    await deleteUser(client, username);
+    const client = await this.connect({ host: connectionDetails.host });
+    await deleteUser(client, username, connectionDetails.database as string);
   }
 
   async deleteDatabase(db: string, connectionDetails: InternalConnectionDetails) {
@@ -33,6 +33,7 @@ class MongoManager implements DBManager<MongoClient> {
       await this.connect(connectionDetails);
       return true;
     } catch (e) {
+      console.log('checkUserCreation error', e);
       return false;
     }
   }

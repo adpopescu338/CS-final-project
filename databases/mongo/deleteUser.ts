@@ -1,7 +1,13 @@
 import { MongoClient } from 'mongodb';
 
-export const deleteUser = async (db: MongoClient, username: string): Promise<void> => {
-  const result = await db.db('users').collection('users').deleteOne({ username });
+export const deleteUser = async (
+  db: MongoClient,
+  username: string,
+  database: string
+): Promise<void> => {
+  const result = await db.db(database).command({
+    dropUser: username,
+  });
 
   if (!result.deletedCount) {
     console.error(`Failed to delete user ${username}`, result);

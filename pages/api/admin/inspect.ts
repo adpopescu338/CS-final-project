@@ -42,7 +42,7 @@ export const logic = async (req: AuthedRequest, res: NextApiResponse) => {
     db: db.name,
   });
 
-  const url = `${process.env.PUBLIC_URL}/admin?` + params.toString();
+  const url = `/admin?` + params.toString();
   console.log('redirecting to', url);
 
   res.redirect(url);

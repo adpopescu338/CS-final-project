@@ -6,7 +6,7 @@ export function onErrorMiddleware(
   request: NextApiRequest,
   response: NextApiResponse
 ) {
-  const path = request.url?.split('?')[0] || request.url;
+  const path = request.url?.split('?')?.[0] || request.url;
   console.log(`Error occurred at ${path}: `, error);
 
   if (error instanceof BeError) {

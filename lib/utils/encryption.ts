@@ -22,6 +22,7 @@ export function encrypt(text: string) {
 }
 
 export function decrypt(encryptedText: string) {
+  if (!encryptedText) return encryptedText;
   const SECRET_KEY = process.env.ENCRYPTION_KEY as string;
   // Extract the salt, IV, and actual encrypted text from the string
   const [saltHex, ivHex, encrypted] = encryptedText.split(':');

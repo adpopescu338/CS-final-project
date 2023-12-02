@@ -42,6 +42,7 @@ export const logic = async (req: AuthedRequest, res: NextApiResponse) => {
 
   const connectionDetails = {
     host: getDatabaseHost(db.type),
+    database: db.name,
   };
 
   await dbManager.deleteDatabase(db.name, connectionDetails);

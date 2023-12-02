@@ -32,6 +32,7 @@ class MysqlManager implements DBManager<Connection> {
       await this.connect(connectionDetails);
       return true;
     } catch (e) {
+      console.log('checkUserCreation error', e);
       return false;
     }
   }

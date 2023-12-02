@@ -67,7 +67,10 @@ const createDbAndUser = async (
       user: userConnectionDetails.username,
       password: userConnectionDetails.password,
       database: userConnectionDetails.database,
-      host: userConnectionDetails.host,
+      // userConnectionDetails.host will be the public URL
+      // we should use the internal network
+      // so only the connection with username and password will be verified
+      host: internalConnectionDetails.host, 
     });
     if (!success) throw new Error('User creation failed');
   } catch (error) {
@@ -83,7 +86,7 @@ const createDbAndUser = async (
     throw new BeError('Failed to create user and database', ErrorCodes.InternalServerError);
   }
 
-  const { id: databaseId } = await client.database.create({
+  await client.database.create({
     data: {
       status: 'Active',
       type: dbType,
