@@ -6,8 +6,8 @@ WORKDIR /usr/src/app
 COPY . .
 
 ENV NODE_ENV=production
-
-RUN yarn prisma generate
+# install dependencies, lockfile
+RUN yarn install --frozen-lockfile
 
 # build app
 RUN yarn build
