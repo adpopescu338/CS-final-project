@@ -7,6 +7,8 @@ COPY . .
 
 ENV NODE_ENV=production
 
+RUN yarn prisma generate
+
 # build app
 RUN yarn build
 

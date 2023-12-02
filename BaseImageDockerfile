@@ -1,15 +1,15 @@
 # Use the official Node.js image as the base image
 FROM node:18-alpine
 
+# Set the working directory in the container to /app
+WORKDIR /usr/src/app
+
 # Install PHP (For Adminer)
 RUN apk --no-cache add php php-fpm php-json php-common php-session
 
 # Copy the package.json file into the container and yarn.lock
 COPY package*.json ./
 COPY yarn.lock ./
-
-# Copy prisma/schema.prisma to generate prisma client
-COPY prisma/schema.prisma ./prisma/
 
 ENV NODE_ENV=production
 # install dependencies, lockfile

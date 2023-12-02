@@ -1,7 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nodeAdminer = require('node-adminer');
+const checkEnvVars = require('./scripts/checkMandatoryEnvVars');
 
 if (process.env.START_ADMINER !== 'false') {
+  checkEnvVars();
   nodeAdminer({
     port: 3015,
     open: false,

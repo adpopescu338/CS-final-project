@@ -11,8 +11,10 @@ const mandatoryEnvVars = [
   'NEXTAUTH_TERCES',
 ];
 
-const missingEnvVars = mandatoryEnvVars.filter((envVar) => !process.env[envVar]);
+module.exports = () => {
+  const missingEnvVars = mandatoryEnvVars.filter((envVar) => !process.env[envVar]);
 
-if (missingEnvVars.length > 0) {
-  throw new Error(`Missing environment variables: ${missingEnvVars.join()}`);
-}
+  if (missingEnvVars.length > 0) {
+    throw new Error(`Missing environment variables: ${missingEnvVars.join()}`);
+  }
+};
