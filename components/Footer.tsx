@@ -3,11 +3,16 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import { Grid, Typography } from '@mui/material';
 import Link from 'next/link';
 
+const footerStyle = {
+  backgroundColor: '#333',
+  color: '#fff',
+  padding: '20px 0',
+  textAlign: 'center' as const,
+};
+
 export const Footer = () => {
   return (
-    <footer
-      style={{ backgroundColor: '#333', color: '#fff', padding: '20px 0', textAlign: 'center' }}
-    >
+    <footer style={footerStyle}>
       <Typography variant="body2" style={{ marginBottom: '8px' }}>
         Connect with me:
       </Typography>

@@ -39,10 +39,9 @@ if [ "$LOCAL_MODE" -eq 1 ]; then
 fi
 
 # Set PUBLIC_URL and DATABASE_URL based on the retrieved or overridden public DNS
-PUBLIC_URL="http://${PUBLIC_DNS}"
-echo "Setting PUBLIC_URL and NEXT_PUBLIC_URL to ${PUBLIC_URL}"
-export PUBLIC_URL="${PUBLIC_URL}"
-export NEXT_PUBLIC_URL="${PUBLIC_URL}"
+echo "Setting PUBLIC_URL and NEXT_PUBLIC_URL to ${PUBLIC_DNS}"
+export PUBLIC_URL="${PUBLIC_DNS}"
+export NEXT_PUBLIC_URL="${PUBLIC_DNS}"
 
 DATABASE_URL="postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432"
 echo "Setting DATABASE_URL to ${DATABASE_URL}"

@@ -50,7 +50,7 @@ export const Navbar = () => {
                 alt="Logo"
                 height={40}
                 width={40}
-                style={{ marginRight: '20px' }}
+                style={{ marginRight: '20px', borderRadius: '30%' }}
               />
             </Grid>
 

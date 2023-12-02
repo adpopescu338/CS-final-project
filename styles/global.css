@@ -14,3 +14,14 @@ body {
   font-family: 'Roboto', sans-serif;
   background-color: #f5f5f5;
 }
+
+#pageWrapper {
+  min-width: 100vw;
+  min-height: calc(100vh - 130px - 64px);
+}
+
+@media screen and (max-width: 600px) {
+  #pageWrapper {
+    min-height: calc(100vh - 130px - 54px);
+  }
+}

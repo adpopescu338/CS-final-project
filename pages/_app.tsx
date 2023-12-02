@@ -1,6 +1,6 @@
 import 'styles/global.css';
 import type { AppProps } from 'next/app';
-import { Navbar, Footer } from 'components';
+import { Navbar, Footer, Page } from 'components';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { SessionProvider } from 'next-auth/react';
 
@@ -23,7 +23,9 @@ export default function App({ Component, pageProps }: AppProps) {
       >
         <QueryClientProvider client={queryClient}>
           <Navbar />
-          <Component {...pageProps} />
+          <Page>
+            <Component {...pageProps} />
+          </Page>
           <Footer />
         </QueryClientProvider>
       </SessionProvider>
