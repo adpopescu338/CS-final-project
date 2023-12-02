@@ -7,6 +7,8 @@ import { Box, Button, CircularProgress, Grid, Tooltip, Typography } from '@mui/m
 import styled from '@emotion/styled';
 import LinearProgress from '@mui/material/LinearProgress';
 import { MAX_GIGA_SIZE_PER_DATABASE } from 'lib/constants';
+import { DBMS } from '@prisma/client';
+import Image from 'next/image';
 
 type IDatabase = Awaited<ReturnType<typeof req.getDatabases>>[number];
 
@@ -105,7 +107,7 @@ const Database: React.FC<{
       <DbBox>
         <Grid container justifyContent="space-between">
           <Grid item>
-            <img src={`${db.type}-logo.png`} alt={db.type + '-logo'} height={70} />
+            <DbLogo type={db.type} />
           </Grid>
           <Grid item>
             <Typography variant="h6">{db.name}</Typography>
@@ -164,4 +166,14 @@ const Database: React.FC<{
       </DbBox>
     </Grid>
   );
+};
+
+const DbLogo: React.FC<{
+  type: DBMS;
+}> = ({ type }) => {
+  const height = 70;
+  const width = type === 'mongodb' ? 60 : type === 'postgresql' ? 112 : 70;
+  const src = `/${type}-logo.png`;
+
+  return <Image src={src} alt={type + '-logo'} height={height} width={width} />;
 };

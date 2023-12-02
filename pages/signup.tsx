@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import swal from 'sweetalert';
-import { signin } from 'lib/utils/signin';
+import { useSignin } from 'lib/utils/useSignin';
 
 const Signup = () => {
   const [step, setStep] = React.useState(0);
@@ -16,6 +16,7 @@ const Signup = () => {
     password: '',
     otp: '',
   });
+  const signin = useSignin();
 
   const getInputProps = (name: string) => ({
     name,
@@ -31,10 +32,11 @@ const Signup = () => {
 
   const handleDetailsSubmit = async (event) => {
     event.preventDefault();
+    setStep(1);
+
     try {
       await req.signup(values);
-      setStep(1);
-    } catch (err) {
+    } catch (err: any) {
       swal(err.message);
     }
   };
@@ -44,9 +46,8 @@ const Signup = () => {
 
     try {
       await req.confirmOtp(values.otp);
-      setStep(2);
       await signin(values.email, values.password);
-    } catch (err) {
+    } catch (err: any) {
       swal(err.message);
     }
   };

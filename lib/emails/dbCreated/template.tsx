@@ -24,21 +24,31 @@ const DbCreated = ({
 }: TemplateProps) => {
   return (
     <Html lang="en">
-      <div
+      <table
         style={{
-          display: 'flex',
-          flexDirection: 'column',
+          width: '100%',
+          borderCollapse: 'collapse',
+          border: 'none',
         }}
       >
-        <h2>Database created!</h2>
-        <p>Your {dbms} database is up and running!</p>
-        <p>Password: {password}</p>
-        <p>Port: {port}</p>
-        <p>Host: {host}</p>
-        <p>Username: {username}</p>
-        <p>Database: {database}</p>
-        {connectionString && <p>Connection string: {connectionString}</p>}
-      </div>
+        <tr>
+          <td
+            style={{
+              padding: '10px',
+              border: 'none',
+            }}
+          >
+            <h2>Database created!</h2>
+            <p>Your {dbms} database is up and running!</p>
+            <p>Password: {password}</p>
+            <p>Port: {port}</p>
+            <p>Host: {host}</p>
+            <p>Username: {username}</p>
+            <p>Database: {database}</p>
+            {connectionString && <p>Connection string: {connectionString}</p>}
+          </td>
+        </tr>
+      </table>
     </Html>
   );
 };

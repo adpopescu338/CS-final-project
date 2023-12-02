@@ -1,49 +1,41 @@
-import sendgrid, { ResponseError } from '@sendgrid/mail';
+import nodemailer from 'nodemailer';
 
 type SendEmailArgs = {
   to: string;
   subject: string;
   html: string;
 };
-export const sendMail = (args: SendEmailArgs): Promise<void> => {
-  if (process.env.DISABLE_EMAILS === 'true') {
-    console.log(
-      `Emails disabled, not sending email for "${args.subject}" to ${args.to}. HTML:`,
-      args.html
-    );
-    return Promise.resolve();
-  }
-  sendgrid.setApiKey(process.env.SENDGRID_API_KEY as string);
+
+export const sendMail = ({ to, subject, html }: SendEmailArgs) => {
+  const user = process.env.EMAIL_ADDRESS;
+  const pass = process.env.EMAIL_PASSWORD;
+  // Create a transporter object using SMTP transport
+  const transporter = nodemailer.createTransport({
+    service: 'yahoo',
+    auth: {
+      user: user,
+      pass: pass,
+    },
+  });
+
+  // Email options
+  const mailOptions = {
+    from: `Easydb <${user}>`, // sender address
+    to,
+    subject,
+    html,
+  };
 
   return new Promise((resolve, reject) => {
-    sendgrid.send(
-      {
-        from: process.env.SENDGRID_FROM_EMAIL as string,
-        ...args,
-      },
-      false,
-      (err) => {
-        if (err) {
-          if (err instanceof ResponseError) {
-            console.log(
-              JSON.stringify(
-                {
-                  body: err.response.body,
-                  headers: err.response.headers,
-                },
-                null,
-                2
-              )
-            );
-          } else {
-            console.log(err);
-          }
-
-          reject(err);
-        } else {
-          resolve(undefined);
-        }
+    // Send email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error(`Error: ${error}`);
+        reject(error);
+      } else {
+        console.log(`Email sent: ${info.response}`);
+        resolve(undefined);
       }
-    );
+    });
   });
 };

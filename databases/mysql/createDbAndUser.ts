@@ -1,6 +1,7 @@
 import { UserDetails, UserCreatedDetails } from '../DBManager';
 import { Connection } from 'mysql2';
 import { MYSQL_PORT } from 'lib/constants';
+import { getDatabaseHost } from 'lib/getDatabaseHost';
 
 export const createDbAndUser = async (
   connection: Connection,
@@ -45,13 +46,15 @@ export const createDbAndUser = async (
           }
           console.log('Read/write access granted!');
 
+          const publicHost = getDatabaseHost('mysql', true);
+
           resolve({
             username,
             password,
             database,
-            connectionUrl: `mysql://${username}:${password}@${process.env.MYSQL_PUBLIC_HOST}:${MYSQL_PORT}/${database}`,
+            connectionUrl: `mysql://${username}:${password}@${publicHost}:${MYSQL_PORT}/${database}`,
             port: MYSQL_PORT,
-            host: process.env.MYSQL_PUBLIC_HOST as string,
+            host: publicHost,
           });
         });
       });

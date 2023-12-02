@@ -12,10 +12,12 @@ import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import { useMediaQuery } from '@mui/material';
 
 export const Navbar = () => {
   const { data: session } = useSession();
   const { push } = useRouter();
+  const moreThan352 = useMediaQuery('(min-width:352px)');
 
   const buttonSize = 'small';
 
@@ -54,13 +56,15 @@ export const Navbar = () => {
 
             <Grid item xs>
               <Grid container spacing={2}>
-                <Grid item>
-                  <Link href="/">
-                    <Button color="secondary" variant="contained" size={buttonSize}>
-                      Home
-                    </Button>
-                  </Link>
-                </Grid>
+                {moreThan352 && (
+                  <Grid item>
+                    <Link href="/">
+                      <Button color="secondary" variant="contained" size={buttonSize}>
+                        Home
+                      </Button>
+                    </Link>
+                  </Grid>
+                )}
                 {session?.user && (
                   <Grid item>
                     <Link href="/dashboard">

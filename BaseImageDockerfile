@@ -1,5 +1,13 @@
 # Use the official Node.js image as the base image
 FROM node:18-alpine
 
+WORKDIR /app
+
+# copy package.json and yarn.lock
+COPY package.json yarn.lock ./
+
+# install dependencies, lockfile
+RUN yarn install --frozen-lockfile
+
 # Install PHP (For Adminer)
 RUN apk --no-cache add php php-fpm php-json php-common php-session

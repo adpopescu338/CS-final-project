@@ -45,7 +45,11 @@ const createDbAndUser = async (
   const { databaseName } = body;
 
   const newUser = {
-    username: email.replace('@', '_').replace('.', '_'),
+    username: email
+      .replaceAll('@', '_')
+      .replaceAll('.', '_')
+      .replaceAll('+', '_')
+      .replaceAll('-', '_'),
     password: uuid().slice(0, 8),
     database: `${name}_${databaseName}_${uuid().slice(0, 8)}`,
   };
