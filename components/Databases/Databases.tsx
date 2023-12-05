@@ -121,7 +121,7 @@ const Database: React.FC<{
         <Grid container justifyContent="space-between">
           <Grid item>
             <LinearProgress variant="determinate" value={db.size / MAX_GIGA_SIZE_PER_DATABASE} />
-            Size: {(db.size * 10).toFixed(2)}/{MAX_GIGA_SIZE_PER_DATABASE * 1000} MB
+            Size: {db.size.toFixed(2)}/{MAX_GIGA_SIZE_PER_DATABASE * 1000} MB
           </Grid>
           <Grid item>
             <Typography variant="caption">{db.status}</Typography>

@@ -1,15 +1,17 @@
 import React from 'react';
 import { req } from 'lib/Req';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
+import Button, { ButtonProps } from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import swal from 'sweetalert';
 import { useSignin } from 'lib/utils/useSignin';
+import { CircularProgress } from '@mui/material';
 
 const Signup = () => {
   const [step, setStep] = React.useState(0);
+  const [loading, setLoading] = React.useState(false);
   const [values, setValues] = React.useState({
     email: '',
     name: '',
@@ -32,23 +34,30 @@ const Signup = () => {
 
   const handleDetailsSubmit = async (event) => {
     event.preventDefault();
-    setStep(1);
+    setLoading(true);
 
     try {
       await req.signup(values);
+      setStep(1);
     } catch (err: any) {
       swal(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleOtpSubmit = async (event) => {
     event.preventDefault();
+    setLoading(true);
 
     try {
       await req.confirmOtp(values.otp);
+      setStep(2);
       await signin(values.email, values.password);
     } catch (err: any) {
       swal(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,18 +77,14 @@ const Signup = () => {
       <TextField label="Email" {...getInputProps('email')} />
       <TextField label="Name" {...getInputProps('name')} />
       <TextField label="Password" {...getInputProps('password')} type="password" />
-      <Button type="submit" fullWidth variant="contained" color="primary">
-        Signup
-      </Button>
+      <LoadingButton loading={loading}>Signup</LoadingButton>
     </Box>,
     <Box key="2" component="form" onSubmit={handleOtpSubmit} sx={{ mt: 3 }}>
       <Typography variant="h6" gutterBottom>
         Please enter the OTP sent to your email
       </Typography>
       <TextField label="OTP" {...getInputProps('otp')} />
-      <Button type="submit" fullWidth variant="contained" color="primary">
-        Verify
-      </Button>
+      <LoadingButton loading={loading}>Verify</LoadingButton>
     </Box>,
     <Box key="3" sx={{ mt: 3 }}>
       <Typography variant="h6" gutterBottom>
@@ -92,6 +97,26 @@ const Signup = () => {
     <Container component="main" maxWidth="xs">
       {steps[step]}
     </Container>
+  );
+};
+
+const LoadingButton: React.FC<
+  {
+    loading: boolean;
+    children: string;
+  } & ButtonProps
+> = ({ loading, children, ...rest }) => {
+  return (
+    <Button
+      type="submit"
+      fullWidth
+      variant="contained"
+      color="primary"
+      disabled={loading}
+      {...rest}
+    >
+      {children} {loading && <CircularProgress size={20} />}
+    </Button>
   );
 };
 
