@@ -9,5 +9,18 @@ COPY package.json yarn.lock ./
 # install dependencies, lockfile
 RUN yarn install --frozen-lockfile
 
-# Install PHP (For Adminer)
-RUN apk --no-cache add php php-fpm php-json php-common php-session
+# Install PHP (For Adminer) and Busybox (For Cron)
+RUN apk --no-cache add \
+    php \
+    php-fpm \
+    php-json \
+    php-common \
+    php-session \
+    php-pdo \
+    php-pdo_mysql \
+    php-mysqli \
+    php-pdo_pgsql \
+    php-pgsql \
+    curl \
+    busybox-extras
+

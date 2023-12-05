@@ -29,6 +29,16 @@ class PostgresManager implements DBManager<Client> {
     await deleteDatabase(client, db);
   }
 
+  async deleteDbAndUser(
+    username: string,
+    database: string,
+    connectionDetails: InternalConnectionDetails
+  ) {
+    const client = await this.connect(connectionDetails);
+    await deleteDatabase(client, database);
+    await deleteUser(client, username);
+  }
+
   async checkUserCreation(connectionDetails: ConnectionDetails) {
     try {
       await this.connect(connectionDetails);

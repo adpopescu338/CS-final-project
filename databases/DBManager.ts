@@ -55,6 +55,19 @@ export interface DBManager<Client> {
   deleteDatabase(databaseName: string, connectionDetails: InternalConnectionDetails): Promise<void>;
 
   /**
+   * @description Delete a database and user. The same as running sequentially deleteUser and deleteDatabase.
+   * But the order varies depending on the DBMS
+   * @param username the username of the user to delete
+   * @param databaseName the name of the database to delete
+   * @param connectionDetails the internal connection details
+   */
+  deleteDbAndUser(
+    username: string,
+    databaseName: string,
+    connectionDetails: InternalConnectionDetails
+  ): Promise<void>;
+
+  /**
    * @description Check if a user was created successfully
    * @param connectionDetails the connection details of the user to check
    * @returns a promise that resolves to true if the user was created successfully and false otherwise

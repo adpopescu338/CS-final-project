@@ -46,9 +46,10 @@ export NEXT_PUBLIC_URL="${PUBLIC_DNS}"
 DATABASE_URL="postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432"
 echo "Setting DATABASE_URL to ${DATABASE_URL}"
 export DATABASE_URL="${DATABASE_URL}"
+export NODE_ENV="production"
 
 # Run docker-compose
-echo "Running docker-compose for databases"
+echo "Running docker-compose"
 docker-compose up --build
 
 echo "Script completed."

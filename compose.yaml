@@ -51,7 +51,8 @@ services:
       - DATABASE_URL
       - SENDGRID_API_KEY
       - SENDGRID_FROM_EMAIL
-      - NODE_ENV=production
+      - NODE_ENV
+      - DISABLE_EMAILS
       - ENCRYPTION_KEY
       - NEXTAUTH_TERCES
       - EMAIL_ADDRESS

@@ -42,11 +42,10 @@ export const logic = async (req: AuthedRequest, res: NextApiResponse) => {
 
   const connectionDetails = {
     host: getDatabaseHost(db.type),
-    database: db.name,
   };
 
-  await dbManager.deleteDatabase(db.name, connectionDetails);
-  await dbManager.deleteUser(decrypt(db.encryptedUsername), connectionDetails);
+  await dbManager.deleteDbAndUser(decrypt(db.encryptedUsername), db.name, connectionDetails);
+
   await client.database.update({
     where: {
       id,

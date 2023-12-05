@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-const nodeAdminer = require('node-adminer');
+import nodeAdminer from 'node-adminer';
 
 if (process.env.START_ADMINER !== 'false') {
   nodeAdminer({
@@ -18,4 +18,4 @@ const nextConfig = {
   ],
 };
 
-module.exports = nextConfig;
+export default nextConfig;

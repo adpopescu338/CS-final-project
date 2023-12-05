@@ -2,13 +2,16 @@
   "name": "easydb",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "START_ADMINER=false next build",
     "start": "next start",
     "lint": "next lint",
     "start-prod": "yarn prisma migrate deploy && yarn start",
-    "start-db": "scripts/start-databases.sh"
+    "start-db": "scripts/start-databases.sh",
+    "compile-cron": "tsc --project tsconfig.cron.json",
+    "start-cron": "node -r tsconfig-paths/register .cron/lib/cron/index.js"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -24,6 +27,7 @@
     "@types/react-dom": "18.2.15",
     "axios": "^1.6.2",
     "bcryptjs": "^2.4.3",
+    "concurrently": "^8.2.2",
     "dotenv": "^16.3.1",
     "eslint": "8.53.0",
     "eslint-config-next": "14.0.3",

@@ -27,6 +27,16 @@ class MysqlManager implements DBManager<Connection> {
     await deleteDatabase(client, db);
   }
 
+  async deleteDbAndUser(
+    username: string,
+    database: string,
+    connectionDetails: InternalConnectionDetails
+  ) {
+    const client = await this.connect(connectionDetails);
+    await deleteUser(client, username);
+    await deleteDatabase(client, database);
+  }
+
   async checkUserCreation(connectionDetails: ConnectionDetails) {
     try {
       await this.connect(connectionDetails);

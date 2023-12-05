@@ -7,6 +7,10 @@ type SendEmailArgs = {
 };
 
 export const sendMail = ({ to, subject, html }: SendEmailArgs) => {
+  if (process.env.DISABLE_EMAILS === 'true') {
+    console.log('Emails are disabled. Skipping email: ', html);
+    return Promise.resolve(undefined);
+  }
   const user = process.env.EMAIL_ADDRESS;
   const pass = process.env.EMAIL_PASSWORD;
   // Create a transporter object using SMTP transport

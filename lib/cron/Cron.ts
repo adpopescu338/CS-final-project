@@ -21,7 +21,11 @@ const dbCheckSizeSelector = {
 type DbCheckSizeValue = Prisma.DatabaseGetPayload<typeof dbCheckSizeSelector>;
 
 class CronClass {
+  private started = false;
   start() {
+    if (this.started) {
+      return;
+    }
     setInterval(() => {
       this.updateDbSize();
     }, 1000 * 60 * 2);
@@ -29,6 +33,8 @@ class CronClass {
     setInterval(() => {
       this.checkExceedingSize();
     }, 1000 * 60 * 3);
+
+    this.started = true;
   }
 
   async updateDbSize() {

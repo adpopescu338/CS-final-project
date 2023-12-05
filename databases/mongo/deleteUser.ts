@@ -9,7 +9,7 @@ export const deleteUser = async (
     dropUser: username,
   });
 
-  if (!result.deletedCount) {
+  if (!result.ok) {
     console.error(`Failed to delete user ${username}`, result);
     throw new Error('Failed to delete user');
   }

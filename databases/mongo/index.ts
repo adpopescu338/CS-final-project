@@ -27,6 +27,16 @@ class MongoManager implements DBManager<MongoClient> {
     await deleteDatabase(client, db);
   }
 
+  async deleteDbAndUser(
+    username: string,
+    database: string,
+    connectionDetails: InternalConnectionDetails
+  ) {
+    const client = await this.connect(connectionDetails);
+    await deleteUser(client, username, database);
+    await deleteDatabase(client, database);
+  }
+
   async checkUserCreation(connectionDetails: ConnectionDetails) {
     console.log('checking user creation', connectionDetails);
     try {
