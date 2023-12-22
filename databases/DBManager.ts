@@ -78,7 +78,7 @@ export interface DBManager<Client> {
    * @deprecated Returns the of the entire database in megabytes
    * The connection details are going to be the same for all databases (the admin user), but the host can be different
    */
-  getWholeDbSize(connectionDetails: InternalConnectionDetails): Promise<number>;
+  getWholeDbSize(connectionDetails: ConnectionDetails): Promise<number>;
 
   /**
    * @description Lock a database (prevent writes)

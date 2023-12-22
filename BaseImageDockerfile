@@ -20,7 +20,5 @@ RUN apk --no-cache add \
     php-pdo_mysql \
     php-mysqli \
     php-pdo_pgsql \
-    php-pgsql \
-    curl \
-    busybox-extras
+    php-pgsql
 

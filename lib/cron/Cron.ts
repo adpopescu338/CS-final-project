@@ -1,4 +1,4 @@
-import { DatabaseStatus, Prisma } from '@prisma/client';
+import { Database, DatabaseStatus, Prisma } from '@prisma/client';
 import { decrypt, getDbManager } from 'lib/utils';
 import { sendDbLockedEmail } from 'lib/emails';
 import { client } from 'prisma/client';
@@ -21,46 +21,53 @@ const dbCheckSizeSelector = {
 type DbCheckSizeValue = Prisma.DatabaseGetPayload<typeof dbCheckSizeSelector>;
 
 class CronClass {
+  private UPDATE_DB_SIZE_INTERVAL = 1000 * 60;
+  private CHECK_EXCEEDING_SIZE_INTERVAL = 1000 * 60 * 1.5;
   private started = false;
-  start() {
+  public start() {
     if (this.started) {
       return;
     }
-    setInterval(() => {
-      this.updateDbSize();
-    }, 1000 * 60 * 2);
-
-    setInterval(() => {
-      this.checkExceedingSize();
-    }, 1000 * 60 * 3);
-
     this.started = true;
+    console.log('Cron:: Starting cron');
+    setInterval(this.updateDbSize.bind(this), this.UPDATE_DB_SIZE_INTERVAL);
+    setInterval(this.checkExceedingSize.bind(this), this.CHECK_EXCEEDING_SIZE_INTERVAL);
   }
 
-  async updateDbSize() {
+  public async checkNewDbSize(db: Database) {
+    await this.updateSingleDbSize(db);
+  }
+
+  private async updateSingleDbSize(db: Database) {
+    const dbManager = getDbManager(db.type);
+    const size = await dbManager.getWholeDbSize({
+      host: getDatabaseHost(db.type),
+      user: decrypt(db.encryptedUsername),
+      password: decrypt(db.encryptedPassword),
+      database: db.name,
+    });
+    if (!size || size === db.size) {
+      console.log(`Cron:: No size change for ${db.name}`);
+      return;
+    }
+
+    await client.database.update({
+      where: {
+        id: db.id,
+      },
+      data: {
+        size,
+      },
+    });
+  }
+
+  private async updateDbSize() {
+    console.log('Cron:: Updating db size');
     const databases = await client.database.findMany(dbCheckSizeSelector);
-    await Promise.all(
-      databases.map(async (db) => {
-        const dbManager = getDbManager(db.type);
-        const size = await dbManager.getWholeDbSize({ host: getDatabaseHost(db.type) });
-        if (!size || size === db.size) {
-          console.log(`Cron:: No size change for ${db.name}`);
-          return;
-        }
-
-        await client.database.update({
-          where: {
-            id: db.id,
-          },
-          data: {
-            size,
-          },
-        });
-      })
-    );
+    await Promise.all(databases.map(this.updateSingleDbSize));
   }
 
-  async checkExceedingSize() {
+  private async checkExceedingSize() {
     const databases = await client.database.findMany({
       ...dbCheckSizeSelector,
       where: {
@@ -78,7 +85,7 @@ class CronClass {
     );
   }
 
-  async lockDbForExceedingSize(db: DbCheckSizeValue) {
+  private async lockDbForExceedingSize(db: DbCheckSizeValue) {
     const dbManager = getDbManager(db.type);
     await dbManager.lockDatabase(decrypt(db.encryptedUsername), db.name, {
       host: getDatabaseHost(db.type),

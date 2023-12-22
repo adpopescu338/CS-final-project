@@ -18,9 +18,4 @@ RUN yarn build
 
 EXPOSE 3000
 
-# Create a cron job to perform the request every 2 minutes
-RUN echo "*/2 * * * * /usr/bin/curl -s http://localhost:3000/api/cron" >> /etc/crontabs/root
-
-
-# Start cron in the background and then your application
-CMD crond -l 2 -f & yarn start-prod
+CMD yarn start-prod

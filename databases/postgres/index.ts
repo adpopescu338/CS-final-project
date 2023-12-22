@@ -49,7 +49,7 @@ class PostgresManager implements DBManager<Client> {
     }
   }
 
-  async getWholeDbSize(connectionDetails: InternalConnectionDetails) {
+  async getWholeDbSize(connectionDetails: ConnectionDetails) {
     const db = await this.connect(connectionDetails);
     return getWholeDbSize(db);
   }
