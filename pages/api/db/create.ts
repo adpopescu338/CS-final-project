@@ -101,6 +101,9 @@ const createDbAndUser = async (
         },
       },
     },
+    include: {
+      user: true,
+    },
   });
 
   // No need to wait for this
